@@ -12,64 +12,36 @@ from odoo import fields, models
 
 
 class LoanApplication(models.Model):
-    # The technical name of the model. Odoo derives the database table from it
-    # by swapping dots for underscores, so this becomes loan_application. You
-    # will use this string everywhere: in XML, in the ORM, and in the Models
-    # list under Settings > Technical.
     _name = "loan.application"
-    # A human-readable label. Odoo uses it in error messages and in the Models
-    # list. Always set it — Odoo logs a warning if you don't.
     _description = "Loan Application"
 
-    # --- Assignment 2.02: the application's own data -----------------------
 
-    # Worked example. "string" is the label the user sees on screen, and
-    # required=True makes Odoo refuse to save a record without a value.
     name = fields.Char(string="Application Number")
 
-    # TODO: loan_term — Integer, labelled "Term (Months)", defaulting to 36.
+    loan_term = fields.Integer(string="Term (Months)", default=36)
 
-    # TODO: interest_rate — Float, labelled "Interest Rate", required=True.
-    #       Pass digits=(5, 2) to store 5 digits in total with 2 of them after
-    #       the decimal point.
+    interest_rate = fields.Float(string="Interest Rate", required=True, digits=(5, 2))
 
-    # TODO: date_applied — Date, labelled "Application Date", defaulting to
-    #       today: default=fields.Date.context_today
-    #
-    #       Note there are no brackets and no lambda. A default takes the
-    #       function itself and Odoo calls it per record. Use context_today
-    #       rather than today: today gives the server's date, context_today
-    #       gives the date in the user's own timezone, which is what someone
-    #       filing an application late in the evening expects to see.
+    date_applied = fields.Date(string="Application Date", default=fields.Date.context_today)
 
-    # TODO: state — Selection offering, in this order: Draft, Sent, Approved,
-    #       Rejected. The value is a list of (technical_key, label) tuples —
-    #       the key is what gets stored, the label is what the user reads. Use
-    #       the keys draft, sent, approved and rejected, and default to
-    #       "draft". There is no cancelled state: abandoning an application
-    #       means archiving it with the active field below.
-    #
-    #       Also pass copy=False. Duplicating a signed loan should give you a
-    #       fresh draft to work from, not a second loan that claims to be
-    #       signed. copy=False makes Odoo fall back to the default instead of
-    #       carrying the value over.
+    state = fields.Selection(selection=[
+        ("draft", "Draft"), 
+        ("sent", "Sent"), 
+        ("approved", "Approved"), 
+        ("rejected", "Rejected"),], default="draft", copy=False)
 
-    # TODO: active — Boolean defaulting to True. Odoo treats this exact field
-    #       name specially: setting it to False hides the record from list
-    #       views instead of deleting it, which is how archiving works.
-
-    # TODO: notes — Html, labelled "Internal Notes", copy=False. Notes are
-    #       about one specific application, so they should not follow a
-    #       duplicate to the new record.
-
+    active = fields.Boolean(default=True)
+    
+    notes = fields.Html(string="Internal Notes", copy=False)
+    
     # --- Assignment 2.03: links to the rest of Odoo ------------------------
 
     # Worked example. A Many2one holds a link to one record in another model.
     # comodel_name says which model, and Odoo stores the other record's
     # database id in a partner_id column.
-    partner_id = fields.Many2one(
-        comodel_name="res.partner", string="Customer", required=True
-    )
+    # partner_id = fields.Many2one(
+    #    comodel_name="res.partner", string="Customer", required=True
+    #)
 
     # TODO: user_id — Many2one to "res.users", labelled "Salesperson",
     #       defaulting to whoever is logged in. self.env.user is the current
@@ -99,7 +71,7 @@ class LoanApplication(models.Model):
     # Worked example. A Many2many links this record to many tags, and each tag
     # back to many loans. Odoo quietly creates the join table that makes that
     # work; you never touch it.
-    tag_ids = fields.Many2many(comodel_name="loan.application.tag", string="Tags")
+    # tag_ids = fields.Many2many(comodel_name="loan.application.tag", string="Tags")
 
     # TODO: document_ids — One2many to "loan.application.document", labelled
     #       "Documents". A One2many is not stored: it is the mirror image of a
