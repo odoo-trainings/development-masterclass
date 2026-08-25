@@ -51,15 +51,6 @@ class LoanApplication(models.Model):
 
     down_payment = fields.Monetary(currency_field="currency_id")
 
-    # --- Assignment 2.08: categorisation and compliance --------------------
-
-    # Worked example. A Many2many links this record to many tags, and each tag
-    # back to many loans. Odoo quietly creates the join table that makes that
-    # work; you never touch it.
-    # tag_ids = fields.Many2many(comodel_name="loan.application.tag", string="Tags")
-
-    # TODO: document_ids — One2many to "loan.application.document", labelled
-    #       "Documents". A One2many is not stored: it is the mirror image of a
-    #       Many2one on the other model, so it has to be told which field over
-    #       there points back here. That is the second argument,
-    #       inverse_name="application_id".
+    tag_ids = fields.Many2many(comodel_name="loan.application.tag", string="Tags")
+    
+    document_ids = fields.One2many(comodel_name='loan.application.document', inverse_name='application_id', string='Compliance Documents')

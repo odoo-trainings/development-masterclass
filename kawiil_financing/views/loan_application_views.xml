@@ -1,17 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!--
-        Loan application: action and views.
-
-        Built up across three assignments:
-          2.05  the action, opening Odoo's automatic views
-          2.07  real list, form and search views, replacing those
-          2.08  the tags field and the Compliance Checklist page
-
-        A view is a record like any other. The layout lives in the arch field
-        as markup, and Odoo picks the highest priority view of each type for a
-        model unless an action names one explicitly.
-    -->
 
     <record id="action_loan_application" model="ir.actions.act_window">
         <field name="name">Loan Applications</field>
@@ -23,6 +11,7 @@
         </field>
     </record>
 
+    
     <record id="loan_application_view_list" model="ir.ui.view">
         <field name="name">loan.application.view.list</field>
         <field name="model">loan.application</field>
@@ -30,6 +19,7 @@
             <list string="Loan Applications" multi_edit="1">
                 <field name="name"/>
                 <field name="partner_id"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" placeholder="Tags..."/>
                 <field name="loan_amount"/>
                 <field name="state" widget="badge" optional="show"
                        decoration-success="state in ('approved', 'signed')" 
@@ -38,7 +28,7 @@
             </list>
         </field>
     </record>
-
+    
     <record id="loan_application_view_form" model="ir.ui.view">
         <field name="name">loan.application.view.form</field>
         <field name="model">loan.application</field>
@@ -53,6 +43,7 @@
                             <field name="name" readonly="1"/>
                         </h1>
                     </div>
+                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" placeholder="Tags..."/>
                     <group>
                         <group>
                             <field name="partner_id"/>
@@ -78,6 +69,16 @@
                                 </group>
                             </group>
                         </page>
+                        <page string="Compliance Checklist">
+                            <field name="document_ids">
+                                <list editable="bottom">
+                                    <field name="type_id"/>
+                                    <field name="name"/>
+                                    <field name="attachment_id"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
                         <page string="Internal Notes">
                             <field name="notes" placeholder="Add internal notes here..."/>
                         </page>
@@ -101,10 +102,28 @@
                 <filter name="filter_approved" string="Approved" domain="[('state','=','approved')]"/>
                 
                 <group>
+                    <filter name="group_by_state" string="Status" context="{'group_by': 'tag_ids'}"/>
                     <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
                     <filter name="group_by_customer" string="Customer" context="{'group_by': 'partner_id'}"/>
                 </group>
             </search>
+        </field>
+    </record>
+    
+    <record id="loan_application_tag_action" model="ir.actions.act_window">
+        <field name="name">Tags</field>
+        <field name="res_model">loan.application.tag</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="loan_application_tag_view_list" model="ir.ui.view">
+        <field name="name">loan.application.tag.view.list</field>
+        <field name="model">loan.application.tag</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/>
+                <field name="color" widget="color_picker"/>
+            </list>
         </field>
     </record>
 

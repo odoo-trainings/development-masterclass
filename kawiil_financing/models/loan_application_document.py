@@ -12,19 +12,20 @@ class LoanApplicationDocument(models.Model):
     _name = "loan.application.document"
     _description = "Loan Application Document"
 
-    # TODO: name — Char, the document's label.
-
-    # TODO: state — Selection with keys new, approved and rejected, labelled
-    #       New, Approved and Rejected. Default to "new".
-
-    # TODO: type_id — Many2one to "loan.application.document.type", labelled
-    #       "Document Type".
-
-    # TODO: application_id — Many2one to "loan.application", labelled
-    #       "Loan Application". This is the field that document_ids on the
-    #       loan points back through, so the two have to agree: name it
-    #       exactly this or the One2many will not resolve.
-
-    # TODO: attachment_id — Many2one to "ir.attachment", labelled "File".
-    #       ir.attachment is Odoo's own model for stored files, so you get
-    #       upload and download for free instead of building it.
+    name = fields.Char(string='Reference/Notes')
+    state = fields.Selection([
+        ('new', 'New'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    ], string='Status', default='new', required=True)
+    
+    # Links to the configuration table
+    type_id = fields.Many2one(comodel_name='loan.application.document.type', string='Document Type', required=True)
+    
+    # The crucial foreign key that links this line back to the parent Loan
+    application_id = fields.Many2one(comodel_name='loan.application', string='Application', 
+                                     ondelete='cascade' # If the loan is deleted, delete these lines too
+    )
+    
+    # Links to Odoo's native attachment model to handle actual file uploads
+    attachment_id = fields.Many2one(comodel_name='ir.attachment', string='File')
