@@ -25,7 +25,7 @@ class LoanApplication(models.Model):
 
     # Worked example. "string" is the label the user sees on screen, and
     # required=True makes Odoo refuse to save a record without a value.
-    name = fields.Char(string="Application Number", required=True)
+    name = fields.Char(string="Application Number")
 
     # TODO: loan_term — Integer, labelled "Term (Months)", defaulting to 36.
 
