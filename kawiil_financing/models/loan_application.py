@@ -34,37 +34,22 @@ class LoanApplication(models.Model):
     
     notes = fields.Html(string="Internal Notes", copy=False)
     
-    # --- Assignment 2.03: links to the rest of Odoo ------------------------
+    partner_id = fields.Many2one(
+        comodel_name="res.partner", string="Customer", required=True
+    )
 
-    # Worked example. A Many2one holds a link to one record in another model.
-    # comodel_name says which model, and Odoo stores the other record's
-    # database id in a partner_id column.
-    # partner_id = fields.Many2one(
-    #    comodel_name="res.partner", string="Customer", required=True
-    #)
+    user_id = fields.Many2one(
+        comodel_name="res.users", string="Salesperson", default=lambda self: self.env.user)
 
-    # TODO: user_id — Many2one to "res.users", labelled "Salesperson",
-    #       defaulting to whoever is logged in. self.env.user is the current
-    #       user, so: default=lambda self: self.env.user
+    product_id = fields.Many2one(
+        comodel_name="product.product", string="Motorcycle")
 
-    # TODO: product_id — Many2one to "product.product", labelled "Motorcycle".
-    #       product.product is the variant, the record that actually gets sold
-    #       and stocked. product.template is the abstract product above it.
+    currency_id = fields.Many2one(
+        comodel_name="res.currency", default=lambda self: self.env.company.currency_id)
 
-    # TODO: currency_id — Many2one to "res.currency". A Monetary field cannot
-    #       format an amount without knowing its currency, so give this one a
-    #       default rather than leaving it empty:
-    #       default=lambda self: self.env.company.currency_id
+    loan_amount = fields.Monetary(required=True, currency_field="currency_id")
 
-    # TODO: loan_amount — Monetary, required=True, with
-    #       currency_field="currency_id".
-
-    # TODO: down_payment — Monetary, with currency_field="currency_id".
-    #
-    #       Monetary is a Float that Odoo renders with a currency symbol and
-    #       the right number of decimals. The field named in currency_field
-    #       has to exist on this same model, which is why currency_id comes
-    #       first.
+    down_payment = fields.Monetary(currency_field="currency_id")
 
     # --- Assignment 2.08: categorisation and compliance --------------------
 

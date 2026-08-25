@@ -6,12 +6,7 @@
     "website": "https://github.com/odoo-trainings/development-masterclass",
     "version": "1.0.0",
     "author": "ODOP, Trainee",
-    # The modules Odoo must install before this one. "base" is the framework
-    # itself, so every module depends on it.
-    # TODO (assignment 2.03): this module starts linking to products, so swap
-    # this for the "product" module. Drop "base" when you do — product already
-    # depends on it, and Odoo installs the whole chain for you.
-    "depends": ["base"],
+    "depends": ["product"],
     # Odoo Proprietary License, the default for custom customer work.
     "license": "OPL-1",
     # XML and CSV files Odoo loads on install, in the order you list them.
