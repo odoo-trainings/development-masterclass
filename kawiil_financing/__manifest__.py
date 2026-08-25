@@ -7,20 +7,19 @@
     "version": "1.0.0",
     "author": "ODOP, Trainee",
     "depends": ["product"],
-    # Odoo Proprietary License, the default for custom customer work.
     "license": "OPL-1",
     # XML and CSV files Odoo loads on install, in the order you list them.
     # TODO (assignments 2.05 to 2.08): register your data files here. Order is
     # not cosmetic — Odoo resolves external ids as it reads, so a file can only
     # refer to something a file above it already created. Security, then views,
     # then the menu that points at them:
-    #     "security/kawiil_financing_groups.xml",
-    #     "security/ir.model.access.csv",
-    #     "security/kawiil_financing_security.xml",
     #     "views/loan_application_tag_views.xml",
     #     "views/loan_application_document_type_views.xml",
          
     "data": [
+        "security/kawiil_financing_groups.xml",
+        "security/ir.model.access.csv",
+        "security/kawiil_financing_security.xml",
         "views/loan_application_views.xml",
         "views/kawiil_financing_menu.xml",
     ],
