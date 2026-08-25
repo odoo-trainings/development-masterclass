@@ -26,7 +26,7 @@
     # TODO (assignments 2.04 and 2.08): configuration data before transactional
     # data, so the loans can refer to tags that already exist:
     #     "demo/config_demo.xml",
-    #     "demo/loan_demo.xml",
-    "demo": [],
+    "demo": [
+        "demo/loan_demo.xml",],
     "application": True,
 }
