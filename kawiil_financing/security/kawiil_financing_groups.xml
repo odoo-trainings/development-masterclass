@@ -32,7 +32,7 @@
     <data noupdate="1">
         <!-- The XML ID also includes the prefix of the module where the record is defined. -->
         <record id="base.user_admin" model="res.users">
-            <field name="group_ids" eval="[Command.link(ref('kawiil_financing_group_admin'))]"/>
+            <field name="group_ids" eval="[Command.link(ref('group_kawiil_financing_admin'))]"/>
         </record>
     </data>
 </odoo>
