@@ -26,25 +26,25 @@
     </record>
 
     <!-- Assignment 2.07. Worked example. -->
-    <record id="loan_application_view_list" model="ir.ui.view">
+    <!-- <record id="loan_application_view_list" model="ir.ui.view">
         <field name="name">loan.application.view.list</field>
         <field name="model">loan.application</field>
         <field name="arch" type="xml">
             <list string="Loan Applications">
                 <field name="name"/>
                 <field name="partner_id"/>
-                <field name="loan_amount"/>
+                <field name="loan_amount"/> -->
                 <!-- A Monetary column needs its currency field present to
                      render, but nobody wants to see a column of identical
                      currencies. column_invisible loads it without showing it. -->
-                <field name="currency_id" column_invisible="True"/>
+                <!-- <field name="currency_id" column_invisible="True"/>
                 <field name="state"/>
-            </list>
+            </list> -->
             <!-- Bonus exercise: try widget="badge" on state, or a
                  decoration-danger attribute driven by a domain, to make the
                  rows carry meaning at a glance. -->
-        </field>
-    </record>
+        <!-- </field>
+    </record> -->
 
     <!--
         Assignment 2.07. Worked example, and the answer to "why are my fields
@@ -57,24 +57,24 @@
         A notebook holds the detail. Anything a user needs at a glance goes on
         the sheet above it; everything else earns a page.
     -->
-    <record id="loan_application_view_form" model="ir.ui.view">
+    <!-- <record id="loan_application_view_form" model="ir.ui.view">
         <field name="name">loan.application.view.form</field>
         <field name="model">loan.application</field>
         <field name="arch" type="xml">
-            <form string="Loan Application">
+            <form string="Loan Application"> -->
                 <!-- The strip above the sheet. A statusbar shows the workflow
                      as a row of stages instead of a dropdown. -->
-                <header>
+                <!-- <header>
                     <field name="state" widget="statusbar"/>
                 </header>
-                <sheet>
+                <sheet> -->
                     <!-- oe_title is the large heading area at the top left of
                          a sheet, where the record's identity goes. -->
-                    <div class="oe_title">
+                    <!-- <div class="oe_title">
                         <h1>
                             <field name="name" readonly="1"/>
                         </h1>
-                    </div>
+                    </div> -->
 
                     <!-- Assignment 2.08. many2many_tags draws the links as
                          coloured pills; color_field says which field holds the
@@ -85,7 +85,7 @@
                          options="{'color_field': 'color'}" and a placeholder.
                     -->
 
-                    <group>
+                    <!-- <group>
                         <group>
                             <field name="partner_id"/>
                             <field name="product_id"/>
@@ -99,11 +99,11 @@
                     <notebook>
                         <page string="Financials">
                             <group>
-                                <group>
+                                <group> -->
                                     <!-- Monetary fields need their currency
                                          on the form to render, but nobody
                                          needs to see it. -->
-                                    <field name="currency_id" invisible="1"/>
+                                    <!-- <field name="currency_id" invisible="1"/>
                                     <field name="loan_amount"/>
                                     <field name="down_payment"/>
                                 </group>
@@ -112,7 +112,7 @@
                                     <field name="interest_rate"/>
                                 </group>
                             </group>
-                        </page>
+                        </page> -->
 
                         <!--
                             TODO (assignment 2.08): a page titled
@@ -129,14 +129,14 @@
                                 </page>
                         -->
 
-                        <page string="Internal Notes">
+                        <!-- <page string="Internal Notes">
                             <field name="notes" placeholder="Add internal notes here..."/>
                         </page>
                     </notebook>
                 </sheet>
             </form>
         </field>
-    </record>
+    </record> -->
 
     <!--
         TODO (assignment 2.07): the search view.

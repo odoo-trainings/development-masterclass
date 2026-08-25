@@ -17,11 +17,13 @@
     #     "security/kawiil_financing_groups.xml",
     #     "security/ir.model.access.csv",
     #     "security/kawiil_financing_security.xml",
-    #     "views/loan_application_views.xml",
     #     "views/loan_application_tag_views.xml",
     #     "views/loan_application_document_type_views.xml",
-    #     "views/kawiil_financing_menu.xml",
-    "data": [],
+         
+    "data": [
+        "views/loan_application_views.xml",
+        "views/kawiil_financing_menu.xml",
+    ],
     # Sample records, loaded only when a database is created with demo data.
     # TODO (assignments 2.04 and 2.08): configuration data before transactional
     # data, so the loans can refer to tags that already exist:
