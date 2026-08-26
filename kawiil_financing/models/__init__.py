@@ -1,4 +1,6 @@
-from . import loan_application
-from . import loan_application_tag
-from . import loan_application_document_type
-from . import loan_application_document
+from . import (
+    loan_application,
+    loan_application_document,
+    loan_application_document_type,
+    loan_application_tag,
+)

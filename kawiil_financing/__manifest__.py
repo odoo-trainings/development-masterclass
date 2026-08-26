@@ -1,13 +1,13 @@
 {
     "name": "Kawiil Financing",
-    "summary": "Module to keep track of Kawiil Motors Loan Cusotmer's Loan Applications",
+    "summary": "Track loan applications for Kawiil Motors customers",
     "category": "Kawiil/Financing",
     "maintainer": "Odoo Developer",
     "website": "https://github.com/odoo-trainings/development-masterclass",
     "version": "1.0.0",
-    "author": "ODOP, Trainee",
+    "author": "ODOP Trainee",
     "depends": ["product"],
-    "license": "OPL-1",      
+    "license": "OPL-1",
     "data": [
         "security/kawiil_financing_groups.xml",
         "security/ir.model.access.csv",
@@ -19,6 +19,7 @@
     ],
     "demo": [
         "demo/config_demo.xml",
-        "demo/loan_demo.xml",],
+        "demo/loan_demo.xml",
+    ],
     "application": True,
 }
