@@ -16,6 +16,23 @@ class LoanApplication(models.Model):
     _name = "loan.application"
     _description = "Loan Application"
 
+    # TODO (3.06): mix the chatter into this model by adding _inherit alongside the
+    # two lines above — keep _name, do not replace it:
+    #
+    #     _inherit = ["mail.thread", "mail.activity.mixin"]
+    #
+    # mail.thread brings the message history and followers; mail.activity.mixin
+    # brings scheduled activities. Both are AbstractModels: they have no table of
+    # their own, so nothing is copied at the database level, their fields and methods
+    # are simply folded into this model. That is why they are called mixins, though
+    # the mechanism is the same _name-plus-_inherit pairing you will use for real
+    # prototype inheritance in the final task.
+    #
+    # The mail module is already in the dependency graph, through product, so the
+    # manifest needs no change. Worth knowing that a module normally declares what it
+    # uses directly rather than leaning on someone else's dependency — this one is
+    # a deliberate shortcut, not the habit to take home.
+
     # TODO (3.02): two database-level constraints, written with the
     # models.Constraint API that replaced _sql_constraints in Odoo 19. Each is a
     # class attribute holding the SQL and the message shown when it is violated:
@@ -46,6 +63,13 @@ class LoanApplication(models.Model):
 
     date_rejected = fields.Date(string="Rejection Date")
 
+    # TODO (3.06): once the chatter is in place, add tracking=True to this field and
+    # to principal_amount. Every change to a tracked field is then written into the
+    # record's message history by itself, with the old and new values side by side.
+    #
+    # Only these two. Tracking every field turns the chatter into noise nobody reads,
+    # which is worse than not having it: pick the ones somebody would be asked to
+    # account for later.
     state = fields.Selection(
         selection=[
             ("draft", "Draft"),
@@ -240,6 +264,18 @@ class LoanApplication(models.Model):
         # Only once that passes: state to "sent", and date_applied to today.
         # fields.Date.context_today(self) gives the user's today; fields.Date.today()
         # gives UTC's, which is a different day for some of them.
+        #
+        # TODO (3.06): once the chatter is in place, post a note here, straight after
+        # the state changes:
+        #
+        #     loan.message_post(
+        #         body=self.env._("Application successfully submitted for review!"),
+        #         subtype_xmlid="mail.mt_note",
+        #     )
+        #
+        # On loan, not on self: message_post writes to one record. mail.mt_note is
+        # the internal-note subtype, so it lands in the history without emailing the
+        # followers — leave it out and everyone following the record gets mail.
         pass
 
     # ---------------------------------------------------------
