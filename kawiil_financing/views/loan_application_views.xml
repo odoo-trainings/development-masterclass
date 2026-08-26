@@ -47,6 +47,9 @@
                     <group>
                         <group>
                             <field name="partner_id"/>
+                            <!-- TODO (3.01): add the related email and phone fields
+                                 here, so picking a customer fills their contact
+                                 details in straight away. -->
                             <field name="product_id"/>
                         </group>
                         <group>
@@ -59,7 +62,16 @@
                         <page string="Financials">
                             <group>
                                 <group>
+                                    <!-- currency_id has to sit in the same group
+                                         as the monetary fields: the widget needs a
+                                         currency to render, and crashes without
+                                         one. Leave it invisible. -->
                                     <field name="currency_id" invisible="1"/>
+                                    <!-- TODO (3.01): add principal_amount to this
+                                         group, and put an explicit
+                                         widget="monetary" on all three financial
+                                         fields, e.g.
+                                         <field name="loan_amount" widget="monetary"/> -->
                                     <field name="loan_amount"/>
                                     <field name="down_payment"/>
                                 </group>

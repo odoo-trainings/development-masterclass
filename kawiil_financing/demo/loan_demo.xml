@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
+        <!-- TODO (3.01): these records break as soon as loan_amount is computed.
+             They still write loan_amount directly, which now runs your inverse
+             method: it works a down_payment back out of a principal_amount nobody
+             set, and the 2500.00 below is replaced by a negative figure. Give each
+             record a principal_amount and drop its loan_amount line. Principal
+             15000.00 with 2500.00 down leaves the 12500.00 loan the first record
+             shows today. -->
         <record id="loan_application_demo_1" model="loan.application">
             <field name="name">LOAN/2026/001</field>
             <field name="partner_id" ref="base.res_partner_1"/>
