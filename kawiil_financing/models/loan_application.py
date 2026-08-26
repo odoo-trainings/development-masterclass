@@ -5,6 +5,9 @@ from odoo import fields, models
 # TODO (3.02): raising a ValidationError means importing it first:
 #     from odoo.exceptions import ValidationError
 
+# TODO (3.03): UserError comes from the same module, so one import line covers
+# both: from odoo.exceptions import UserError, ValidationError
+
 
 class LoanApplication(models.Model):
     _name = "loan.application"
@@ -33,6 +36,10 @@ class LoanApplication(models.Model):
     date_applied = fields.Date(
         string="Application Date", default=fields.Date.context_today
     )
+
+    # TODO (3.03): add `date_approved` and `date_rejected`, both Date fields, so the
+    # workflow leaves a trail of when each decision was taken. No default — they are
+    # stamped by the action methods, not at creation.
 
     state = fields.Selection(
         selection=[
@@ -160,4 +167,37 @@ class LoanApplication(models.Model):
         # is greater than or equal to principal_amount. Wrap the message in
         # self.env._("...") so it can be exported to the translation files — that
         # is the Odoo 19 idiom, and it replaces the older `from odoo import _`.
+        pass
+
+    # TODO (3.03): the three buttons in the form header call these by name. A method
+    # behind a type="object" button takes no arguments beyond self, and whatever it
+    # returns is handed back to the web client — returning nothing simply reloads
+    # the record, which is all these need to do.
+
+    def action_submit(self):
+        # TODO (3.03): the guard first, the state change second.
+        #
+        # Pull the mandatory documents out of document_ids with filtered(), keyed on
+        # the document type: type_id.is_required. Note the field name — the task
+        # sheet calls it is_mandatory, but the model defines `is_required`.
+        #
+        # Refuse the submission with a UserError if there are no mandatory documents
+        # at all, or if any of them is not yet in the "approved" state. Wrap the
+        # message in self.env._() exactly as you did for the ValidationError at 3.02.
+        #
+        # Only once that passes: state to "sent", date_applied to today
+        # (fields.Date.context_today(self) gives you the user's today, not UTC's).
+        pass
+
+    def action_approve_loan(self):
+        # TODO (3.03): state to "approved", date_approved to today.
+        #
+        # Write both in one go — self.write({...}) — rather than as two separate
+        # assignments. The Day 1 record rule only lets the financing *user* group
+        # write to applications that are not yet approved, so a second write landing
+        # after the state is already "approved" can be refused for those users.
+        pass
+
+    def action_reject_loan(self):
+        # TODO (3.03): state to "rejected", date_rejected to today.
         pass

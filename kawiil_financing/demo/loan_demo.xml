@@ -45,5 +45,29 @@
             <field name="state">draft</field>
         </record>
 
+        <!-- TODO (3.03): these records set state by hand, which walks straight past
+             the workflow. Now that the action methods exist, the honest way to put a
+             demo record into a state is to call the method that gets it there:
+
+                 <function model="loan.application" name="action_submit"
+                          eval="[[ref('loan_application_demo_1')]]"/>
+
+             Drop the state field from loan_application_demo_1 and let the call set
+             it. Odoo's own demo data works this way, e.g. crm_lead_demo.xml calling
+             action_set_won. Only demo_1 needs it here, since draft is the default.
+
+             Three things to know before you try it:
+
+             1. action_submit refuses to run unless the application has at least one
+                mandatory document, already approved. These records have no document
+                lines at all, so the call raises your UserError and the module fails
+                to install. Add loan.application.document records of the required
+                types, in the approved state, before the function node.
+             2. action_submit also stamps date_applied with today, so demo_1 loses
+                its fixed 2026-01-15 date.
+             3. A function node runs in file order, so it has to sit after the
+                records it acts on. Inside data noupdate="1" it runs on install only
+                and is skipped on a module update. -->
+
     </data>
 </odoo>

@@ -35,6 +35,16 @@
         <field name="arch" type="xml">
             <form string="Loan Application">
                 <header>
+                    <!-- TODO (3.03): three buttons here, before the statusbar:
+                         Send for Approval, Approve and Reject. Each needs
+                         name="<your method>" and type="object", which is what tells
+                         Odoo to call a Python method on the record rather than run
+                         an action.
+
+                         Use invisible= to keep each one out of the way until it
+                         applies, e.g. invisible="state != 'draft'" on the submit
+                         button. Plain Python in the attribute — the attrs
+                         dictionary from older versions is gone. -->
                     <field name="state" widget="statusbar" statusbar_visible="draft,sent,approved"/>
                 </header>
                 <sheet>
@@ -54,6 +64,11 @@
                         </group>
                         <group>
                             <field name="date_applied"/>
+                            <!-- TODO (3.03): show date_approved and date_rejected
+                                 here once the fields exist. Worth hiding each one
+                                 until it has been set — invisible="not
+                                 date_approved" — so a draft application is not
+                                 cluttered with empty decision dates. -->
                             <field name="user_id"/>
                         </group>
                     </group>
@@ -88,6 +103,13 @@
                                     <field name="name"/>
                                     <field name="attachment_id"/>
                                     <field name="state"/>
+                                    <!-- TODO (3.03): an approve and a reject button
+                                         on each line, calling the two action methods
+                                         on loan.application.document. Same
+                                         type="object", plus icon="fa-check" and
+                                         icon="fa-times" to keep the column narrow.
+                                         A button in a list acts on the line it sits
+                                         on, so no field needs passing to it. -->
                                 </list>
                             </field>
                         </page>

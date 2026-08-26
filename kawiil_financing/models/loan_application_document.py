@@ -29,3 +29,18 @@ class LoanApplicationDocument(models.Model):
 
     # Links to Odoo's native attachment model to handle actual file uploads
     attachment_id = fields.Many2one(comodel_name="ir.attachment", string="File")
+
+    # TODO (3.03): two action methods, one per button you add to the inline list in
+    # the loan application form. Each sets this document's state — "approved" and
+    # "rejected" respectively. Nothing else: the buttons are wired to these by name.
+    #
+    # A button with type="object" calls the method on the records it is sitting on,
+    # so `self` here is the document line that was clicked.
+
+    def action_approve_document(self):
+        # TODO (3.03): set state to "approved".
+        pass
+
+    def action_reject_document(self):
+        # TODO (3.03): set state to "rejected".
+        pass
