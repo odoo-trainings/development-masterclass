@@ -5,33 +5,34 @@
               name="Financing"
               web_icon="kawiil_financing,static/description/icon.png"
               sequence="10"/>
-    
-    <menuitem id="menu_kawiil_financing"
-        parent="menu_kawiil_financing_root"
-        name="Financing"
-        sequence="10"/>
-    <menuitem id="menu_loan_application"
-        parent="menu_kawiil_financing"
-          name="Loan Applications"
-          action="action_loan_application"
-          sequence="10"/>
 
-    <menuitem id="loan_application_menu_configuration" 
-              name="Configuration" 
-              parent="menu_kawiil_financing_root" 
-              sequence="100"
-              groups="group_kawiil_financing_admin"/>
-
-    <menuitem id="loan_application_tag_menu" 
-              name="Tags" 
-              parent="loan_application_menu_configuration" 
-              action="loan_application_tag_action" 
+    <menuitem id="menu_kawiil_financing_motorcycle"
+              name="Motorcycle Financing"
+              parent="menu_kawiil_financing_root"
               sequence="10"/>
 
-    <menuitem id="loan_application_document_type_menu" 
-              name="Document Types" 
-              parent="loan_application_menu_configuration" 
-              action="loan_application_document_type_action" 
+    <menuitem id="menu_loan_application"
+              name="Loan Applications"
+              parent="menu_kawiil_financing_motorcycle"
+              action="action_loan_application"
+              sequence="10"/>
+
+    <menuitem id="menu_kawiil_financing_configuration"
+              name="Configuration"
+              parent="menu_kawiil_financing_root"
+              groups="kawiil_financing.group_kawiil_financing_admin"
+              sequence="100"/>
+
+    <menuitem id="menu_loan_application_tag"
+              name="Tags"
+              parent="menu_kawiil_financing_configuration"
+              action="action_loan_application_tag"
+              sequence="10"/>
+
+    <menuitem id="menu_loan_application_document_type"
+              name="Document Types"
+              parent="menu_kawiil_financing_configuration"
+              action="action_loan_application_document_type"
               sequence="20"/>
 
 </odoo>
