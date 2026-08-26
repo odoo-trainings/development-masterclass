@@ -1,10 +1,3 @@
-# ODOP assignment 2.08 - documents.
-#
-# One piece of paperwork attached to one loan application. This is the model
-# behind the Compliance Checklist tab you will add to the loan form.
-#
-# Follow the pattern in loan_application_tag.py.
-
 from odoo import fields, models
 
 

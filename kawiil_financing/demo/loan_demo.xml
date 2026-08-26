@@ -2,12 +2,9 @@
 <odoo>
     <data noupdate="1">
         <record id="loan_application_demo_1" model="loan.application">
-            <!-- name and partner_id are required=True on the model, so every
-                 record here has to set them or the install crashes. -->
             <field name="name">LOAN/2026/001</field>
             <field name="partner_id" ref="base.res_partner_1"/>
             <field name="product_id" ref="product.product_product_4"/>
-            <!-- A plain date, written the way the database stores it. -->
             <field name="date_applied">2026-01-15</field>
             <field name="loan_amount">12500.00</field>
             <field name="down_payment">2500.00</field>
@@ -16,12 +13,9 @@
             <field name="state">sent</field>
         </record>
         <record id="loan_application_demo_2" model="loan.application">
-            <!-- name and partner_id are required=True on the model, so every
-                 record here has to set them or the install crashes. -->
             <field name="name">LOAN/2026/002</field>
             <field name="partner_id" ref="base.res_partner_2"/>
             <field name="product_id" ref="product.product_product_3"/>
-            <!-- A plain date, written the way the database stores it. -->
             <field name="date_applied" eval="(DateTime.now() - relativedelta(months=5)).strftime('%Y-%m-%d')"/>
             <field name="loan_amount">17500.00</field>
             <field name="down_payment">2500.00</field>
@@ -30,11 +24,8 @@
             <field name="state">draft</field>
         </record>
         <record id="loan_application_demo_3" model="loan.application">
-            <!-- name and partner_id are required=True on the model, so every
-                 record here has to set them or the install crashes. -->
             <field name="name">LOAN/2026/003</field>
             <field name="partner_id" ref="base.res_partner_3"/>
-            <!-- A plain date, written the way the database stores it. -->
             <field name="date_applied" eval="(DateTime.now() - relativedelta(months=2)).strftime('%Y-%m-%d')"/>
             <field name="loan_amount">17500.00</field>
             <field name="down_payment">2500.00</field>

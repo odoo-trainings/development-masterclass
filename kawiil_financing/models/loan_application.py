@@ -1,13 +1,3 @@
-# ODOP assignments 2.02, 2.03, 2.07 and 2.08 — the loan.application model.
-#
-# Fill in every field marked TODO, working through the sections in order. Each
-# section starts with one field written out as a worked example — copy its
-# shape for the rest.
-#
-# Two things to get right once the fields are done, or none of this will load:
-#   models/__init__.py            must import this file.
-#   kawiil_financing/__init__.py  must import the models folder.
-
 from odoo import fields, models
 
 
