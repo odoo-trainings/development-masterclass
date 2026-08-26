@@ -6,7 +6,10 @@
     "website": "https://github.com/odoo-trainings/development-masterclass",
     "version": "1.0.0",
     "author": "ODOP Trainee",
-    "depends": ["product"],
+    # contacts brings the Contacts app itself. base.view_partner_form is always
+    # there, so the inherited view would load without it, but the menu to reach a
+    # partner form would not exist.
+    "depends": ["contacts", "product"],
     "license": "OPL-1",
     "data": [
         "security/kawiil_financing_groups.xml",
@@ -15,6 +18,7 @@
         "views/loan_application_views.xml",
         "views/loan_application_tag_views.xml",
         "views/loan_application_document_type_views.xml",
+        "views/res_partner_views.xml",
         "views/kawiil_financing_menu.xml",
     ],
     "demo": [
