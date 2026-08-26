@@ -8,6 +8,10 @@
              record a principal_amount and drop its loan_amount line. Principal
              15000.00 with 2500.00 down leaves the 12500.00 loan the first record
              shows today. -->
+        <!-- TODO (3.02): at 3.02 that stops being optional. The CHECK constraint
+             you add there refuses any principal_amount of 0, and these records
+             have none, so the module will not install until each one has a
+             principal. -->
         <record id="loan_application_demo_1" model="loan.application">
             <field name="name">LOAN/2026/001</field>
             <field name="partner_id" ref="base.res_partner_1"/>

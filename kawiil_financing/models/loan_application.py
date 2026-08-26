@@ -2,10 +2,27 @@
 # @api.depends, so `api` has to join this import.
 from odoo import fields, models
 
+# TODO (3.02): raising a ValidationError means importing it first:
+#     from odoo.exceptions import ValidationError
+
 
 class LoanApplication(models.Model):
     _name = "loan.application"
     _description = "Loan Application"
+
+    # TODO (3.02): two database-level constraints, written with the
+    # models.Constraint API that replaced _sql_constraints in Odoo 19. Each is a
+    # class attribute holding the SQL and the message shown when it is violated:
+    #
+    #     _<name> = models.Constraint(
+    #         "<SQL definition>",
+    #         "<message the user sees>",
+    #     )
+    #
+    # Add a UNIQUE one that stops two applications sharing the same name, and a
+    # CHECK one keeping principal_amount strictly above zero. Postgres enforces
+    # both, so they hold however the record was made — the form, an import, or the
+    # shell — which is exactly what makes them worth having.
 
     name = fields.Char(string="Application Number")
 
@@ -129,3 +146,18 @@ class LoanApplication(models.Model):
     # Note what it costs: every application is loaded to answer one filter. That is
     # the price of searching a field the database cannot see, and it is why
     # store=True is usually the better answer when the arithmetic is this simple.
+
+    # TODO (3.02): a Python constraint, for the rule SQL is the wrong tool for: a
+    # customer cannot put down a deposit as large as the motorcycle itself.
+    #
+    # Decorate the method with @api.constrains("principal_amount", "down_payment")
+    # so Odoo re-runs it whenever either field is written. Note the difference from
+    # the SQL constraints above: this one only fires on writes that go through the
+    # ORM, and it can say something specific about what went wrong.
+
+    def _check_down_payment(self):
+        # TODO (3.02): loop over self, and raise ValidationError where down_payment
+        # is greater than or equal to principal_amount. Wrap the message in
+        # self.env._("...") so it can be exported to the translation files — that
+        # is the Odoo 19 idiom, and it replaces the older `from odoo import _`.
+        pass
