@@ -8,6 +8,9 @@ from odoo import fields, models
 # TODO (3.03): UserError comes from the same module, so one import line covers
 # both: from odoo.exceptions import UserError, ValidationError
 
+# TODO (3.04): Command joins the odoo import. Mind the order ruff wants —
+# capitals sort first: from odoo import Command, api, fields, models
+
 
 class LoanApplication(models.Model):
     _name = "loan.application"
@@ -105,6 +108,10 @@ class LoanApplication(models.Model):
         string="Compliance Documents",
     )
 
+    # ---------------------------------------------------------
+    # COMPUTE / INVERSE METHODS
+    # ---------------------------------------------------------
+
     # TODO (3.01): the two methods behind loan_amount. The names are not free
     # choices — they are the strings you pass to compute= and inverse= on the
     # field, and the quality gate expects a compute method to start with
@@ -154,6 +161,10 @@ class LoanApplication(models.Model):
     # the price of searching a field the database cannot see, and it is why
     # store=True is usually the better answer when the arithmetic is this simple.
 
+    # ---------------------------------------------------------
+    # CONSTRAINTS
+    # ---------------------------------------------------------
+
     # TODO (3.02): a Python constraint, for the rule SQL is the wrong tool for: a
     # customer cannot put down a deposit as large as the motorcycle itself.
     #
@@ -169,35 +180,98 @@ class LoanApplication(models.Model):
         # is the Odoo 19 idiom, and it replaces the older `from odoo import _`.
         pass
 
+    # ---------------------------------------------------------
+    # ACTION METHODS
+    # ---------------------------------------------------------
+
     # TODO (3.03): the three buttons in the form header call these by name. A method
     # behind a type="object" button takes no arguments beyond self, and whatever it
     # returns is handed back to the web client — returning nothing simply reloads
     # the record, which is all these need to do.
+    #
+    # All three open the same way: loop over self, and skip any record that is not in
+    # the state the transition starts from.
+    #
+    #     for loan in self:
+    #         if loan.state != "draft":
+    #             continue
 
     def action_submit(self):
         # TODO (3.03): the guard first, the state change second.
         #
-        # Pull the mandatory documents out of document_ids with filtered(), keyed on
-        # the document type: type_id.is_required. Note the field name — the task
-        # sheet calls it is_mandatory, but the model defines `is_required`.
+        # Ask each line whether it counts, instead of reaching into the document type
+        # from here — the document already knows:
         #
-        # Refuse the submission with a UserError if there are no mandatory documents
-        # at all, or if any of them is not yet in the "approved" state. Wrap the
-        # message in self.env._() exactly as you did for the ValidationError at 3.02.
+        #     required_docs = loan.document_ids.filtered(
+        #         lambda doc: doc._is_required_for_submit()
+        #     )
         #
-        # Only once that passes: state to "sent", date_applied to today
-        # (fields.Date.context_today(self) gives you the user's today, not UTC's).
+        # Refuse with a UserError if there are none at all, and again if any of them
+        # fails _is_valid_for_submit(). Wrap both messages in self.env._(), the same
+        # call you used for the ValidationError at 3.02. It takes arguments too, so
+        # self.env._("Document '%s' is not approved.", doc.name) stays translatable —
+        # never build the sentence with an f-string, or the translation export sees a
+        # different string every time.
+        #
+        # Only once that passes: state to "sent", and date_applied to today.
+        # fields.Date.context_today(self) gives the user's today; fields.Date.today()
+        # gives UTC's, which is a different day for some of them.
         pass
 
     def action_approve_loan(self):
         # TODO (3.03): state to "approved", date_approved to today.
         #
-        # Write both in one go — self.write({...}) — rather than as two separate
-        # assignments. The Day 1 record rule only lets the financing *user* group
-        # write to applications that are not yet approved, so a second write landing
-        # after the state is already "approved" can be refused for those users.
+        # Write both in one call — loan.write({...}) — not as two assignments. Each
+        # assignment is a write of its own with its own access check, and the Day 1
+        # record rule only lets group_kawiil_financing_user write to applications
+        # that are not yet approved. A second write arriving once the state is
+        # already "approved" is refused for those users. Testing as an admin hides
+        # this: rules from different groups are OR'd, so the admin rule lets it pass.
         pass
 
     def action_reject_loan(self):
         # TODO (3.03): state to "rejected", date_rejected to today.
         pass
+
+    # ---------------------------------------------------------
+    # CRUD OVERRIDES
+    # ---------------------------------------------------------
+
+    # TODO (3.04): the compliance checklist should build itself. Nobody should have
+    # to click "Add a line" five times to record the documents the dealership always
+    # asks for.
+    #
+    # Two methods, deliberately kept apart: a helper that decides which document
+    # types belong on a new application, and a create() override that turns them into
+    # lines. Split that way, a module inheriting this one can change what lands on
+    # the checklist by overriding the helper alone — the same reasoning that put
+    # _is_required_for_submit() on the document rather than here.
+
+    def _get_default_document_types(self):
+        # TODO (3.04): decorate with @api.model. It runs before any record exists,
+        # so there is no recordset for it to work on.
+        #
+        # Return the active document types:
+        # self.env["loan.application.document.type"].search([]). The archived ones
+        # are already excluded — the model has an `active` field, and Odoo filters on
+        # it unless you tell it otherwise.
+        pass
+
+    # TODO (3.04): then the override itself. It is not stubbed here on purpose: a
+    # create() that forgets to return super()'s result breaks every record creation
+    # in the module, demo data included, so it is better written whole than left
+    # half-finished. Write it as:
+    #
+    #     @api.model_create_multi
+    #     def create(self, vals_list):
+    #         ...
+    #         return super().create(vals_list)
+    #
+    # Between those, for each vals dict in vals_list, turn each document type into a
+    # line with Command.create({"type_id": doc_type.id}) and add the list to
+    # vals["document_ids"]. Use vals.get("document_ids", []) + commands so that lines
+    # somebody already filled in during creation survive.
+    #
+    # Command is the named form of the old "magic tuples" — Command.create(...)
+    # instead of (0, 0, {...}). Import it only in the chapter you use it: an unused
+    # import is an F401 and the Quality Gate will stop you.

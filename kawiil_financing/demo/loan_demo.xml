@@ -45,29 +45,39 @@
             <field name="state">draft</field>
         </record>
 
-        <!-- TODO (3.03): these records set state by hand, which walks straight past
-             the workflow. Now that the action methods exist, the honest way to put a
-             demo record into a state is to call the method that gets it there:
+        <!-- TODO (3.03): these records set state by hand, which walks straight
+             past the workflow you just built. Leave them for now: putting them
+             through the real methods means every application needs its compliance
+             documents first, and those do not exist yet. You come back to this at
+             3.04, once create() builds the checklist for you. -->
 
+        <!-- TODO (3.04): now that create() fills in the checklist, these records get
+             their document lines for free, and the state above can stop being a
+             hand-written lie. Replace it with the methods that earn it:
+
+                 <function model="loan.application.document" name="action_approve_document"
+                          eval="[obj().search([('application_id','=',ref('loan_application_demo_1')),
+                                               ('type_id.is_required','=',True)]).ids]"/>
                  <function model="loan.application" name="action_submit"
                           eval="[[ref('loan_application_demo_1')]]"/>
 
-             Drop the state field from loan_application_demo_1 and let the call set
+             Approve first, then submit: action_submit refuses an application whose
+             required documents are not settled, which is the whole point of it.
+             Drop the state field from loan_application_demo_1 and let the calls set
              it. Odoo's own demo data works this way, e.g. crm_lead_demo.xml calling
-             action_set_won. Only demo_1 needs it here, since draft is the default.
+             action_set_won. Only demo_1 needs it, since draft is the default.
 
-             Three things to know before you try it:
+             Two details that decide whether this works:
 
-             1. action_submit refuses to run unless the application has at least one
-                mandatory document, already approved. These records have no document
-                lines at all, so the call raises your UserError and the module fails
-                to install. Add loan.application.document records of the required
-                types, in the approved state, before the function node.
-             2. action_submit also stamps date_applied with today, so demo_1 loses
-                its fixed 2026-01-15 date.
-             3. A function node runs in file order, so it has to sit after the
+             1. `obj` in an eval is that function's own model, so obj().search(...)
+                searches loan.application.document. The lines are created by your
+                override and have no xml ids, so searching is how you reach them.
+             2. A function node runs in file order, so it has to sit after the
                 records it acts on. Inside data noupdate="1" it runs on install only
-                and is skipped on a module update. -->
+                and is skipped on a module update.
+
+             Note that action_submit stamps date_applied with today, so demo_1 gives
+             up its fixed 2026-01-15 date. -->
 
     </data>
 </odoo>

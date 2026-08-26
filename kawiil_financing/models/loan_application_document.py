@@ -30,11 +30,15 @@ class LoanApplicationDocument(models.Model):
     # Links to Odoo's native attachment model to handle actual file uploads
     attachment_id = fields.Many2one(comodel_name="ir.attachment", string="File")
 
+    # ---------------------------------------------------------
+    # ACTION METHODS
+    # ---------------------------------------------------------
+
     # TODO (3.03): two action methods, one per button you add to the inline list in
     # the loan application form. Each sets this document's state — "approved" and
     # "rejected" respectively. Nothing else: the buttons are wired to these by name.
     #
-    # A button with type="object" calls the method on the records it is sitting on,
+    # A button with type="object" calls the method on the record it is sitting on,
     # so `self` here is the document line that was clicked.
 
     def action_approve_document(self):
@@ -43,4 +47,25 @@ class LoanApplicationDocument(models.Model):
 
     def action_reject_document(self):
         # TODO (3.03): set state to "rejected".
+        pass
+
+    # ---------------------------------------------------------
+    # SUBMISSION RULES
+    # ---------------------------------------------------------
+
+    # TODO (3.03): the loan application asks each of its lines these two questions
+    # when someone tries to submit it. They live here, on the document, rather than
+    # in the application, so that the application never has to know how a document
+    # makes up its mind — and so the rules change in one place when they change.
+    #
+    # Both are called on a single line at a time, so `self` is one record here.
+
+    def _is_required_for_submit(self):
+        # TODO (3.03): return True when this line has to be present and settled
+        # before its application can go out. The document type carries that flag.
+        pass
+
+    def _is_valid_for_submit(self):
+        # TODO (3.03): return True when this line is in a state the application can
+        # be submitted with.
         pass
