@@ -40,9 +40,11 @@ class LoanApplication(models.Model):
         string="Application Date", default=fields.Date.context_today
     )
 
-    # TODO (3.03): add `date_approved` and `date_rejected`, both Date fields, so the
-    # workflow leaves a trail of when each decision was taken. No default — they are
-    # stamped by the action methods, not at creation.
+    # No default on these two: they are stamped by the action methods when the
+    # decision is actually taken, not when the record is created.
+    date_approved = fields.Date(string="Approval Date")
+
+    date_rejected = fields.Date(string="Rejection Date")
 
     state = fields.Selection(
         selection=[
@@ -184,17 +186,39 @@ class LoanApplication(models.Model):
     # ACTION METHODS
     # ---------------------------------------------------------
 
-    # TODO (3.03): the three buttons in the form header call these by name. A method
+    # The three buttons in the form header call these methods by name. A method
     # behind a type="object" button takes no arguments beyond self, and whatever it
-    # returns is handed back to the web client — returning nothing simply reloads
-    # the record, which is all these need to do.
+    # returns goes back to the web client — returning nothing simply reloads the
+    # record, which is all a transition needs to do.
     #
-    # All three open the same way: loop over self, and skip any record that is not in
-    # the state the transition starts from.
-    #
-    #     for loan in self:
-    #         if loan.state != "draft":
-    #             continue
+    # action_approve_loan below is written out as the worked example. The other two
+    # follow its shape: loop over self, skip any record that is not in the state the
+    # transition starts from, then write the change.
+
+    def action_approve_loan(self):
+        """Worked example: the approval transition, start to finish."""
+        for loan in self:
+            if loan.state != "sent":
+                continue
+            # Both values in one write, deliberately. Each assignment would be a
+            # write of its own with its own access check, and the Day 1 record rule
+            # only lets group_kawiil_financing_user write to applications that are
+            # not yet approved — so a second write arriving once the state is already
+            # "approved" is refused for those users. Testing as an admin hides it:
+            # rules from different groups are OR'd, and the admin rule lets it pass.
+            loan.write(
+                {
+                    "state": "approved",
+                    "date_approved": fields.Date.context_today(loan),
+                }
+            )
+
+    # TODO (3.03): the other two transitions, following the method above.
+
+    def action_reject_loan(self):
+        # TODO (3.03): state to "rejected", date_rejected to today. Same shape as
+        # action_approve_loan, including the single write.
+        pass
 
     def action_submit(self):
         # TODO (3.03): the guard first, the state change second.
@@ -218,21 +242,6 @@ class LoanApplication(models.Model):
         # gives UTC's, which is a different day for some of them.
         pass
 
-    def action_approve_loan(self):
-        # TODO (3.03): state to "approved", date_approved to today.
-        #
-        # Write both in one call — loan.write({...}) — not as two assignments. Each
-        # assignment is a write of its own with its own access check, and the Day 1
-        # record rule only lets group_kawiil_financing_user write to applications
-        # that are not yet approved. A second write arriving once the state is
-        # already "approved" is refused for those users. Testing as an admin hides
-        # this: rules from different groups are OR'd, so the admin rule lets it pass.
-        pass
-
-    def action_reject_loan(self):
-        # TODO (3.03): state to "rejected", date_rejected to today.
-        pass
-
     # ---------------------------------------------------------
     # CRUD OVERRIDES
     # ---------------------------------------------------------
@@ -247,15 +256,15 @@ class LoanApplication(models.Model):
     # the checklist by overriding the helper alone — the same reasoning that put
     # _is_required_for_submit() on the document rather than here.
 
+    # TODO (3.04): this one needs a decorator. It runs before any record exists, so
+    # there is no recordset for it to work on: add @api.model above it once `api` is
+    # imported. The body is already written for you.
+
     def _get_default_document_types(self):
-        # TODO (3.04): decorate with @api.model. It runs before any record exists,
-        # so there is no recordset for it to work on.
-        #
-        # Return the active document types:
-        # self.env["loan.application.document.type"].search([]). The archived ones
-        # are already excluded — the model has an `active` field, and Odoo filters on
-        # it unless you tell it otherwise.
-        pass
+        """The document types that belong on a new application's checklist."""
+        # search([]) already leaves out the archived types: the model has an `active`
+        # field, and Odoo filters on it unless you tell it otherwise.
+        return self.env["loan.application.document.type"].search([])
 
     # TODO (3.04): then the override itself. It is not stubbed here on purpose: a
     # create() that forgets to return super()'s result breaks every record creation

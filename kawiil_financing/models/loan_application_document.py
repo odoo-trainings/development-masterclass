@@ -34,16 +34,15 @@ class LoanApplicationDocument(models.Model):
     # ACTION METHODS
     # ---------------------------------------------------------
 
-    # TODO (3.03): two action methods, one per button you add to the inline list in
-    # the loan application form. Each sets this document's state — "approved" and
-    # "rejected" respectively. Nothing else: the buttons are wired to these by name.
-    #
-    # A button with type="object" calls the method on the record it is sitting on,
-    # so `self` here is the document line that was clicked.
+    # One action method per button in the inline checklist. A button with
+    # type="object" calls the method on the record it is sitting on, so `self` here
+    # is the single document line whose button was clicked.
 
     def action_approve_document(self):
-        # TODO (3.03): set state to "approved".
-        pass
+        self.state = "approved"
+
+    # TODO (3.03): the other half of the pair. Same shape as the method above, with
+    # the state it belongs to. The button you add for it is wired by this name.
 
     def action_reject_document(self):
         # TODO (3.03): set state to "rejected".
@@ -53,19 +52,18 @@ class LoanApplicationDocument(models.Model):
     # SUBMISSION RULES
     # ---------------------------------------------------------
 
-    # TODO (3.03): the loan application asks each of its lines these two questions
-    # when someone tries to submit it. They live here, on the document, rather than
-    # in the application, so that the application never has to know how a document
-    # makes up its mind — and so the rules change in one place when they change.
+    # The loan application asks each of its lines these two questions when someone
+    # tries to submit it. They live here, on the document, rather than in the
+    # application: the application never has to know how a document makes up its
+    # mind, and when the rules change they change in one place. You will call both
+    # from action_submit at 3.03.
     #
-    # Both are called on a single line at a time, so `self` is one record here.
+    # Both are called on one line at a time, so `self` is a single record here.
 
     def _is_required_for_submit(self):
-        # TODO (3.03): return True when this line has to be present and settled
-        # before its application can go out. The document type carries that flag.
-        pass
+        """Whether this line must be settled before its application can go out."""
+        return self.type_id.is_required
 
     def _is_valid_for_submit(self):
-        # TODO (3.03): return True when this line is in a state the application can
-        # be submitted with.
-        pass
+        """Whether this line is in a state the application can be submitted with."""
+        return self.state == "approved"

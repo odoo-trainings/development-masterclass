@@ -51,8 +51,11 @@
              documents first, and those do not exist yet. You come back to this at
              3.04, once create() builds the checklist for you. -->
 
-        <!-- TODO (3.04): now that create() fills in the checklist, these records get
-             their document lines for free, and the state above can stop being a
+        <!-- OPTIONAL (3.04): a stretch exercise, not part of the chapter. Skip it if
+             you are short of time.
+
+             Now that create() fills in the checklist, these records get their
+             document lines for free, and the state above can stop being a
              hand-written lie. Replace it with the methods that earn it:
 
                  <function model="loan.application.document" name="action_approve_document"
@@ -77,7 +80,13 @@
                 and is skipped on a module update.
 
              Note that action_submit stamps date_applied with today, so demo_1 gives
-             up its fixed 2026-01-15 date. -->
+             up its fixed 2026-01-15 date.
+
+             Worth knowing before you spend time on it: demo data is loaded when the
+             module is installed, not when it is updated, and a function node inside
+             noupdate="1" is skipped on an update entirely. On a build that only
+             updates the module you will write this correctly and see nothing change.
+             It takes a fresh install to observe. -->
 
     </data>
 </odoo>
