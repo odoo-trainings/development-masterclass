@@ -25,7 +25,19 @@
         </field>
     </record>
 
-    <!-- Assignment 2.07. Worked example. -->
+    <!--
+        Assignment 2.07. Worked example. Uncomment the record below when you
+        reach 2.07 — delete the two comment markers around it, nothing else.
+
+        A Monetary column needs its currency field present to render, but
+        nobody wants to see a column of identical currencies.
+        column_invisible loads it without showing it.
+
+        Bonus exercise: try widget="badge" on state, or a decoration-danger
+        attribute driven by a domain, to make the rows carry meaning at a
+        glance.
+    -->
+    <!--
     <record id="loan_application_view_list" model="ir.ui.view">
         <field name="name">loan.application.view.list</field>
         <field name="model">loan.application</field>
@@ -34,21 +46,16 @@
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="loan_amount"/>
-                <!-- A Monetary column needs its currency field present to
-                     render, but nobody wants to see a column of identical
-                     currencies. column_invisible loads it without showing it. -->
                 <field name="currency_id" column_invisible="True"/>
                 <field name="state"/>
             </list>
-            <!-- Bonus exercise: try widget="badge" on state, or a
-                 decoration-danger attribute driven by a domain, to make the
-                 rows carry meaning at a glance. -->
         </field>
     </record>
+    -->
 
     <!--
         Assignment 2.07. Worked example, and the answer to "why are my fields
-        stacked vertically".
+        stacked vertically". Uncomment the record below when you reach 2.07.
 
         The nesting is what makes the columns. The outer group opens a column
         layout; each inner group becomes one column of labels and fields. A
@@ -56,35 +63,32 @@
 
         A notebook holds the detail. Anything a user needs at a glance goes on
         the sheet above it; everything else earns a page.
+
+        Three things worth reading closely as you uncomment it:
+
+          header       the strip above the sheet. A statusbar shows the
+                       workflow as a row of stages instead of a dropdown.
+          oe_title     the large heading area at the top left of a sheet,
+                       where the record's identity goes.
+          currency_id  carries invisible="1". Monetary fields need their
+                       currency on the form to render, but nobody needs to
+                       see it.
     -->
+    <!--
     <record id="loan_application_view_form" model="ir.ui.view">
         <field name="name">loan.application.view.form</field>
         <field name="model">loan.application</field>
         <field name="arch" type="xml">
             <form string="Loan Application">
-                <!-- The strip above the sheet. A statusbar shows the workflow
-                     as a row of stages instead of a dropdown. -->
                 <header>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
-                    <!-- oe_title is the large heading area at the top left of
-                         a sheet, where the record's identity goes. -->
                     <div class="oe_title">
                         <h1>
                             <field name="name" readonly="1"/>
                         </h1>
                     </div>
-
-                    <!-- Assignment 2.08. many2many_tags draws the links as
-                         coloured pills; color_field says which field holds the
-                         palette index.
-
-                         TODO (2.08): add tag_ids here, with
-                         widget="many2many_tags",
-                         options="{'color_field': 'color'}" and a placeholder.
-                    -->
-
                     <group>
                         <group>
                             <field name="partner_id"/>
@@ -95,14 +99,10 @@
                             <field name="user_id"/>
                         </group>
                     </group>
-
                     <notebook>
                         <page string="Financials">
                             <group>
                                 <group>
-                                    <!-- Monetary fields need their currency
-                                         on the form to render, but nobody
-                                         needs to see it. -->
                                     <field name="currency_id" invisible="1"/>
                                     <field name="loan_amount"/>
                                     <field name="down_payment"/>
@@ -113,22 +113,6 @@
                                 </group>
                             </group>
                         </page>
-
-                        <!--
-                            TODO (assignment 2.08): a page titled
-                            "Compliance Checklist" holding document_ids in an
-                            embedded editable list, so paperwork can be added
-                            without leaving the loan:
-
-                                <page string="Compliance Checklist">
-                                    <field name="document_ids">
-                                        <list editable="bottom">
-                                            ... the columns you want ...
-                                        </list>
-                                    </field>
-                                </page>
-                        -->
-
                         <page string="Internal Notes">
                             <field name="notes" placeholder="Add internal notes here..."/>
                         </page>
@@ -137,6 +121,32 @@
             </form>
         </field>
     </record>
+    -->
+
+    <!--
+        TODO (assignment 2.08): two additions to the form above, once you have
+        uncommented it in 2.07.
+
+        1. tag_ids, on a line of its own directly above the first <group>.
+           many2many_tags draws the links as coloured pills, and color_field
+           says which field holds the palette index:
+
+               <field name="tag_ids" widget="many2many_tags"
+                      options="{'color_field': 'color'}"
+                      placeholder="Tags..."/>
+
+        2. a page titled "Compliance Checklist", after the Financials page,
+           holding document_ids in an embedded editable list so paperwork can
+           be added without leaving the loan:
+
+               <page string="Compliance Checklist">
+                   <field name="document_ids">
+                       <list editable="bottom">
+                           ... the columns you want ...
+                       </list>
+                   </field>
+               </page>
+    -->
 
     <!--
         TODO (assignment 2.07): the search view.
@@ -179,8 +189,6 @@
            Add one for state and one for partner_id. Give every filter its own
            name: duplicates confuse Odoo about which one is active.
 
-           Do not put expand="0" on that group. You will see it in older code
-           and it still parses, but nothing in Odoo 19 core writes it any more.
     -->
 
 </odoo>

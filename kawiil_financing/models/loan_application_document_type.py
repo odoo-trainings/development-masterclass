@@ -6,7 +6,10 @@
 #
 # Follow the pattern in loan_application_tag.py.
 
-from odoo import fields, models
+# fields is unused until you write your first field below, which makes the
+# Quality Gate flag it as an unused import. noqa silences that one check on
+# this one line. Delete the comment once you have added a field.
+from odoo import fields, models  # noqa: F401
 
 
 class LoanApplicationDocumentType(models.Model):

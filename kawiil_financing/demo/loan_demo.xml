@@ -16,8 +16,11 @@
     <data noupdate="1">
 
         <record id="loan_application_demo_1" model="loan.application">
-            <!-- name and partner_id are required=True on the model, so every
-                 record here has to set them or the install crashes. -->
+            <!-- partner_id is required=True on the model, so every record
+                 here has to set it or the install crashes. name is not
+                 required, but a record without one shows up as
+                 "loan.application,4" in every dropdown, so always give it
+                 one. -->
             <field name="name">LOAN/2026/001</field>
             <!-- ref looks up another record by its external identifier and
                  stores that record's database id. Never hardcode a number:
@@ -44,10 +47,10 @@
                 <field name="date_applied"
                        eval="(DateTime.now() - relativedelta(months=5)).strftime('%Y-%m-%d')"/>
 
-            Fill in the rest of the fields with values of your own. Since
-            assignment 2.07 made name, loan_amount and interest_rate
-            required=True, every record here has to set those three plus
-            partner_id, or the module will crash on update.
+            Fill in the rest of the fields with values of your own.
+            interest_rate from 2.02, and partner_id and loan_amount from 2.03,
+            are all required=True, so every record here has to set those three
+            or the module will crash on update.
         -->
 
         <!--

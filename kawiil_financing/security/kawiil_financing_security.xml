@@ -6,7 +6,7 @@
         Access rights, in ir.model.access.csv, decide whether you may touch a
         model at all. Record rules decide which rows of it. The CSV lets a User
         write to loan applications; the rule below narrows that to the ones
-        that are not signed yet.
+        that are not approved yet.
 
         Rules attached to a group are combined with OR. A user in two groups
         gets access if either group's rule allows it, which is what makes the
@@ -24,15 +24,15 @@
 
         <!-- Worked example. Note the four perm flags: they say which
              operations the rule polices, and they all default to True. Read is
-             switched off deliberately, so a User can still open and view a
-             signed loan. Create is off because a brand new record has no
+             switched off deliberately, so a User can still open and view an
+             approved loan. Create is off because a brand new record has no
              state to test yet. That leaves write and delete, which is exactly
              what we want to restrict. -->
         <record id="loan_application_rule_user" model="ir.rule">
-            <field name="name">Loan Application: user cannot change signed loans</field>
+            <field name="name">Loan Application: user cannot change approved loans</field>
             <field name="model_id" ref="model_loan_application"/>
             <field name="groups" eval="[(4, ref('group_kawiil_financing_user'))]"/>
-            <field name="domain_force">[('state', 'not in', ['signed'])]</field>
+            <field name="domain_force">[('state', 'not in', ['approved'])]</field>
             <field name="perm_read" eval="False"/>
             <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="False"/>
@@ -50,7 +50,7 @@
 
                 <field name="domain_force">[(1, '=', 1)]</field>
 
-            Odoo then checks (state != signed) OR (1 == 1) for the Admin, and
+            Odoo then checks (state != approved) OR (1 == 1) for the Admin, and
             the second half is always true.
         -->
 

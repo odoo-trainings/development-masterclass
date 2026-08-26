@@ -23,8 +23,9 @@ class LoanApplication(models.Model):
 
     # --- Assignment 2.02: the application's own data -----------------------
 
-    # Worked example. "string" is the label the user sees on screen, and
-    # required=True makes Odoo refuse to save a record without a value.
+    # Worked example. "string" is the label the user sees on screen. Leave it
+    # off and Odoo derives one from the field name, which would give you "Name"
+    # here rather than "Application Number".
     name = fields.Char(string="Application Number")
 
     # TODO: loan_term — Integer, labelled "Term (Months)", defaulting to 36.
@@ -49,10 +50,10 @@ class LoanApplication(models.Model):
     #       "draft". There is no cancelled state: abandoning an application
     #       means archiving it with the active field below.
     #
-    #       Also pass copy=False. Duplicating a signed loan should give you a
-    #       fresh draft to work from, not a second loan that claims to be
-    #       signed. copy=False makes Odoo fall back to the default instead of
-    #       carrying the value over.
+    #       Also pass copy=False. Duplicating an approved loan should give
+    #       you a fresh draft to work from, not a second loan that claims to
+    #       be approved. copy=False makes Odoo fall back to the default
+    #       instead of carrying the value over.
 
     # TODO: active — Boolean defaulting to True. Odoo treats this exact field
     #       name specially: setting it to False hides the record from list
@@ -64,12 +65,12 @@ class LoanApplication(models.Model):
 
     # --- Assignment 2.03: links to the rest of Odoo ------------------------
 
-    # Worked example. A Many2one holds a link to one record in another model.
-    # comodel_name says which model, and Odoo stores the other record's
-    # database id in a partner_id column.
-    partner_id = fields.Many2one(
-        comodel_name="res.partner", string="Customer", required=True
-    )
+    # Worked example. Uncomment it when you reach 2.03. A Many2one holds a
+    # link to one record in another model. comodel_name says which model, and
+    # Odoo stores the other record's database id in a partner_id column.
+    # partner_id = fields.Many2one(
+    #     comodel_name="res.partner", string="Customer", required=True
+    # )
 
     # TODO: user_id — Many2one to "res.users", labelled "Salesperson",
     #       defaulting to whoever is logged in. self.env.user is the current
@@ -96,10 +97,11 @@ class LoanApplication(models.Model):
 
     # --- Assignment 2.08: categorisation and compliance --------------------
 
-    # Worked example. A Many2many links this record to many tags, and each tag
-    # back to many loans. Odoo quietly creates the join table that makes that
-    # work; you never touch it.
-    tag_ids = fields.Many2many(comodel_name="loan.application.tag", string="Tags")
+    # Worked example. Uncomment it when you reach 2.08, once the tag model
+    # next door exists. A Many2many links this record to many tags, and each
+    # tag back to many loans. Odoo quietly creates the join table that makes
+    # that work; you never touch it.
+    # tag_ids = fields.Many2many(comodel_name="loan.application.tag", string="Tags")
 
     # TODO: document_ids — One2many to "loan.application.document", labelled
     #       "Documents". A One2many is not stored: it is the mirror image of a

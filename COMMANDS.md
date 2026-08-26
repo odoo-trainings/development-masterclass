@@ -14,7 +14,7 @@ Allow Odoo.sh to push code to the repository using a writable deploy key on the 
 ```bash
 # Configure Identity (Every time you have a new container): Ensure your commits are attributed to you.
 git config --global user.name "Your Name"
-git config --global user.email "your-email@example.com"
+git config --global user.email "youremail@example.com"
 
 
 # Commit and push
@@ -126,6 +126,8 @@ loan.state
 new_loan = env['loan.application'].create({
     'name': 'LOAN/SHELL/001',
     'partner_id': env.ref('base.res_partner_4').id,
+    'interest_rate': 7.5,
+    'loan_amount': 9500,
 })
 
 # Delete
