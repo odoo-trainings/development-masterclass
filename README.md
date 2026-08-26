@@ -85,4 +85,17 @@ Your repository is pre-configured with the following structure:
 * `COMMANDS.md` - **Every command you will need**, for git, Odoo, the shell and the code checkers. Keep it open.
 * `kawiil_financing/` - **This is where you will work.** The module folder is already created, with its `__manifest__.py`, `__init__.py` and `models/` package waiting for you to fill in. Your `views/` and `security/` folders go in here too, not in the repository root.
 
+---
+
+## 🧩 How to Read the Starter Code
+
+The module ships with every assignment's scaffolding already in place, so the files you open will contain work you have not reached yet. Two markers tell you what to do with it:
+
+* **`TODO`** - code you write yourself. The comment tells you the field, its type and anything non-obvious about it.
+* **A commented-out worked example** - code that is written for you, but belongs to a later assignment. It is commented out so the module still installs at every step: uncommenting a link to a model that does not exist yet will crash the install.
+
+Each worked example says which assignment it belongs to, in the form *"Uncomment it when you reach 2.03"*. Leave it alone until then, and when you get there remove the comment markers and nothing else.
+
+The same rule governs `__manifest__.py`. The `data` and `demo` lists show every file you will eventually register, each tagged with the assignment that adds it. Add each line when you reach that assignment, not before, and insert it in the position shown rather than appending - Odoo resolves external ids in the order it reads the files.
+
 Good luck, and happy coding!
