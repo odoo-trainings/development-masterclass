@@ -34,8 +34,13 @@ from odoo import api, fields, models  # noqa: F401
 #         string="Loan Applications",
 #     )
 #
+#     # A distinct label from the One2many above, deliberately. Two fields on one
+#     # model sharing a label makes Odoo warn at startup, and it warns twice here:
+#     # res.users carries res.partner's fields too, so the clash is reported against
+#     # both models. Core names these the same way, e.g. sale_order_count is
+#     # "Sale Order Count".
 #     loan_application_count = fields.Integer(
-#         string="Loan Applications",
+#         string="Loan Application Count",
 #         compute="_compute_loan_application_count",
 #     )
 #
