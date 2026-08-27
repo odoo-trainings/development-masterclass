@@ -106,10 +106,12 @@ class LoanApplication(models.Model):
         comodel_name="res.currency", default=lambda self: self.env.company.currency_id
     )
 
-    # The full price of the motorcycle. A plain Monetary, like down_payment below:
-    # the interesting one is loan_amount, which is worked out from these two.
+    # The full price of the motorcycle, and the figure the user actually types.
+    # required here rather than on loan_amount: once loan_amount is derived it is
+    # not something anyone can be asked to fill in, and a required column with
+    # nothing writing to it only produces NOT NULL errors.
     principal_amount = fields.Monetary(
-        string="Principal Amount", currency_field="currency_id"
+        string="Principal Amount", required=True, currency_field="currency_id"
     )
 
     # TODO (3.01): loan_amount stops being a figure anyone types in.
@@ -118,14 +120,12 @@ class LoanApplication(models.Model):
     #   - decorate that method with @api.depends on both source fields
     #   - give the field an inverse method as well, so that typing a loan_amount
     #     works the deposit back out: down_payment = principal_amount - loan_amount
-    #   - move required=True off this field and onto principal_amount. A derived
-    #     figure is not something the user can be asked to fill in.
     # Two things to expect once it is computed: a computed field is read-only
     # unless it declares an inverse, and an unstored one cannot be searched or
     # sorted, so COMMANDS.md's search([("loan_amount", ">", 10000)]) snippet stops
     # working and the list view column stops sorting. store=True, or a search=
     # method, brings those back.
-    loan_amount = fields.Monetary(required=True, currency_field="currency_id")
+    loan_amount = fields.Monetary(currency_field="currency_id")
 
     down_payment = fields.Monetary(currency_field="currency_id")
 

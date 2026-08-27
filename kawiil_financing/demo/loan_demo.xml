@@ -11,7 +11,11 @@
 
              So they set principal_amount and down_payment, and let loan_amount fall
              out of the arithmetic. That is the general lesson: once a field is
-             derived, writing to it is no longer the same thing as setting it. -->
+             derived, writing to it is no longer the same thing as setting it.
+
+             Until you do 3.01 these applications show a loan amount of zero, since
+             nothing sets it and nothing works it out yet. Making that column right
+             is the first thing 3.01 does. -->
         <record id="loan_application_demo_1" model="loan.application">
             <field name="name">LOAN/2026/001</field>
             <field name="partner_id" ref="base.res_partner_1"/>
