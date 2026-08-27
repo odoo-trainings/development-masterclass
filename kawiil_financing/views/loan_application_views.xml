@@ -60,9 +60,14 @@
                     <group>
                         <group>
                             <field name="partner_id"/>
-                            <!-- TODO (3.01): add the related email and phone fields
-                                 here, so picking a customer fills their contact
-                                 details in straight away. -->
+                            <!-- TODO (3.01): uncomment these two once the related
+                                 fields exist on the model. They are commented rather
+                                 than written in because a view referring to a field
+                                 that does not exist yet stops the module installing.
+
+                            <field name="email"/>
+                            <field name="phone"/>
+                            -->
                             <field name="product_id"/>
                         </group>
                         <group>
@@ -86,11 +91,14 @@
                                          currency to render, and crashes without
                                          one. Leave it invisible. -->
                                     <field name="currency_id" invisible="1"/>
-                                    <!-- TODO (3.01): add principal_amount to this
-                                         group, and put an explicit
-                                         widget="monetary" on all three financial
-                                         fields, e.g.
-                                         <field name="loan_amount" widget="monetary"/> -->
+                                    <!-- TODO (3.01): swap the three fields below for
+                                         these, which add principal_amount and make
+                                         the monetary widget explicit on each.
+
+                                    <field name="principal_amount" widget="monetary"/>
+                                    <field name="down_payment" widget="monetary"/>
+                                    <field name="loan_amount" widget="monetary"/>
+                                    -->
                                     <field name="loan_amount"/>
                                     <field name="down_payment"/>
                                 </group>

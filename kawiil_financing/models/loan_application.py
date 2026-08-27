@@ -33,19 +33,19 @@ class LoanApplication(models.Model):
     # uses directly rather than leaning on someone else's dependency — this one is
     # a deliberate shortcut, not the habit to take home.
 
-    # TODO (3.02): two database-level constraints, written with the
-    # models.Constraint API that replaced _sql_constraints in Odoo 19. Each is a
-    # class attribute holding the SQL and the message shown when it is violated:
-    #
-    #     _<name> = models.Constraint(
-    #         "<SQL definition>",
-    #         "<message the user sees>",
-    #     )
-    #
-    # Add a UNIQUE one that stops two applications sharing the same name, and a
-    # CHECK one keeping principal_amount strictly above zero. Postgres enforces
-    # both, so they hold however the record was made — the form, an import, or the
-    # shell — which is exactly what makes them worth having.
+    # Database-level constraints, written with the models.Constraint API that
+    # replaced _sql_constraints in Odoo 19: a class attribute holding the SQL and
+    # the message shown when it is violated. Postgres enforces them, so they hold
+    # however the record was made — the form, an import, or the shell — which is
+    # exactly what makes them worth having.
+    _name_uniq = models.Constraint(
+        "UNIQUE(name)",
+        "Two applications cannot share the same reference.",
+    )
+
+    # TODO (3.02): a second one, following the example above: a CHECK that keeps
+    # principal_amount strictly above zero. Nobody finances a motorcycle that costs
+    # nothing, and a principal of zero would make the loan arithmetic meaningless.
 
     name = fields.Char(string="Application Number")
 
@@ -106,8 +106,11 @@ class LoanApplication(models.Model):
         comodel_name="res.currency", default=lambda self: self.env.company.currency_id
     )
 
-    # TODO (3.01): add `principal_amount`, a Monetary field holding the full price
-    # of the motorcycle, next to the two fields below.
+    # The full price of the motorcycle. A plain Monetary, like down_payment below:
+    # the interesting one is loan_amount, which is worked out from these two.
+    principal_amount = fields.Monetary(
+        string="Principal Amount", currency_field="currency_id"
+    )
 
     # TODO (3.01): loan_amount stops being a figure anyone types in.
     #   - compute it from principal_amount - down_payment, in a method that
@@ -148,14 +151,22 @@ class LoanApplication(models.Model):
     # Leave it off and the field is computed once and never refreshed again.
 
     def _compute_loan_amount(self):
-        # TODO (3.01): loan_amount = principal_amount - down_payment, assigned one
-        # record at a time with `for record in self:`.
-        pass
+        # TODO (3.01): the arithmetic is right, the shape is wrong. This assigns to
+        # self, which only works when self holds exactly one record — and a compute
+        # method is handed every record that needs the value at once, so as soon as
+        # two applications are read together it fails with
+        #
+        #     ValueError: Expected singleton: loan.application(1, 2, 3)
+        #
+        # That error is the one you will meet most often in Odoo, and this is what it
+        # always means: code written for one record was given several. Wrap the line
+        # in `for record in self:` and assign to record instead of self.
+        self.loan_amount = self.principal_amount - self.down_payment
 
     def _inverse_loan_amount(self):
-        # TODO (3.01): the same arithmetic rearranged. Odoo calls this on save for
-        # the records whose loan_amount was typed in by hand, and principal_amount
-        # is the figure that stays put:
+        # TODO (3.01): the same arithmetic rearranged, in the shape you just gave the
+        # compute. Odoo calls this on save for the records whose loan_amount was
+        # typed in by hand, and principal_amount is the figure that stays put:
         #     down_payment = principal_amount - loan_amount
         pass
 
