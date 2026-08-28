@@ -1,7 +1,6 @@
 from odoo import api, fields, models
 
-# TODO (3.02): raising a ValidationError means importing it first:
-#     from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError
 
 # TODO (3.03): UserError comes from the same module, so one import line covers
 # both: from odoo.exceptions import UserError, ValidationError
@@ -40,10 +39,10 @@ class LoanApplication(models.Model):
         "UNIQUE(name)",
         "Two applications cannot share the same reference.",
     )
-
-    # TODO (3.02): a second one, following the example above: a CHECK that keeps
-    # principal_amount strictly above zero. Nobody finances a motorcycle that costs
-    # nothing, and a principal of zero would make the loan arithmetic meaningless.
+    _principal_check = models.Constraint(
+        'CHECK(principal_amount > 0)', 
+        'The principal amount must be strictly greater than zero.'
+    )
 
     name = fields.Char(string="Application Number")
 
@@ -140,20 +139,14 @@ class LoanApplication(models.Model):
     # CONSTRAINTS
     # ---------------------------------------------------------
 
-    # TODO (3.02): a Python constraint, for the rule SQL is the wrong tool for: a
-    # customer cannot put down a deposit as large as the motorcycle itself.
-    #
-    # Decorate the method with @api.constrains("principal_amount", "down_payment")
-    # so Odoo re-runs it whenever either field is written. Note the difference from
-    # the SQL constraints above: this one only fires on writes that go through the
-    # ORM, and it can say something specific about what went wrong.
-
+    @api.constrains("principal_amount", "down_payment")
     def _check_down_payment(self):
-        # TODO (3.02): loop over self, and raise ValidationError where down_payment
-        # is greater than or equal to principal_amount. Wrap the message in
-        # self.env._("...") so it can be exported to the translation files — that
-        # is the Odoo 19 idiom, and it replaces the older `from odoo import _`.
-        pass
+        for loan in self:
+            if loan.down_payment >= loan.principal_amount:
+                # We use self.env._() instead of the legacy global _() import
+                raise ValidationError(
+                    self.env._("The down payment cannot be greater than or equal to the principal amount.")
+                )
 
     # ---------------------------------------------------------
     # ACTION METHODS
