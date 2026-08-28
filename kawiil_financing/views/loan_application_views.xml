@@ -44,16 +44,18 @@
                     <button name="action_approve_loan" type="object"
                             string="Approve" class="btn-primary"
                             invisible="state != 'sent'"/>
-                    <!-- TODO (3.03): two more, following the one above. Send for
-                         Approval calls action_submit and belongs to draft
-                         applications; Reject calls action_reject_loan and applies
-                         wherever Approve does. -->
+                    <button name="action_reject_loan" type="object"
+                            string="Reject" class="btn-secondary"
+                            invisible="state != 'sent'"/>
+                    <button name="action_submit" type="object"
+                            string="Submit" class="btn-primary"
+                            invisible="state != 'draft'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,sent,approved"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
                         <h1>
-                            <field name="name" readonly="1"/>
+                            <field name="name"/>
                         </h1>
                     </div>
                     <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" placeholder="Tags..."/>
@@ -109,9 +111,9 @@
                                     <button name="action_approve_document"
                                             type="object" icon="fa-check"
                                             title="Approve"/>
-                                    <!-- TODO (3.03): the reject button, following the
-                                         one above: action_reject_document, with
-                                         icon="fa-times". -->
+                                    <button name="action_reject_document"
+                                            type="object" icon="fa-times"
+                                            title="Reject"/>
                                 </list>
                             </field>
                         </page>

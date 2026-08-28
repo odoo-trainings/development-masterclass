@@ -1,9 +1,6 @@
 from odoo import api, fields, models
 
-from odoo.exceptions import ValidationError
-
-# TODO (3.03): UserError comes from the same module, so one import line covers
-# both: from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import UserError, ValidationError
 
 # TODO (3.04): Command joins the odoo import. Mind the order ruff wants —
 # capitals sort first: from odoo import Command, api, fields, models
@@ -179,33 +176,45 @@ class LoanApplication(models.Model):
                 }
             )
 
-    # TODO (3.03): the other two transitions, following the method above.
-
     def action_reject_loan(self):
-        # TODO (3.03): state to "rejected", date_rejected to today. Same shape as
-        # action_approve_loan, including the single write.
-        pass
+        for loan in self:
+            if loan.state != "sent":
+                continue
+            loan.write(
+                {
+                    "state": "rejected",
+                    "date_rejected": fields.Date.context_today(loan),
+                }
+            )
 
     def action_submit(self):
-        # TODO (3.03): the guard first, the state change second.
-        #
-        # Ask each line whether it counts, instead of reaching into the document type
-        # from here — the document already knows:
-        #
-        #     required_docs = loan.document_ids.filtered(
-        #         lambda doc: doc._is_required_for_submit()
-        #     )
-        #
-        # Refuse with a UserError if there are none at all, and again if any of them
-        # fails _is_valid_for_submit(). Wrap both messages in self.env._(), the same
-        # call you used for the ValidationError at 3.02. It takes arguments too, so
-        # self.env._("Document '%s' is not approved.", doc.name) stays translatable —
-        # never build the sentence with an f-string, or the translation export sees a
-        # different string every time.
-        #
-        # Only once that passes: state to "sent", and date_applied to today.
-        # fields.Date.context_today(self) gives the user's today; fields.Date.today()
-        # gives UTC's, which is a different day for some of them.
+        for loan in self:
+            if loan.state != "draft":
+                continue
+            required_docs = loan.document_ids.filtered(
+                lambda doc: doc._is_required_for_submit()
+            )
+            if not required_docs:
+                raise UserError(
+                    self.env._(
+                        "Attach the required supporting documents before submitting"
+                    )
+                )
+            unapproved = required_docs.filtered(
+                lambda doc: not doc._is_valid_for_submit()
+            )
+            if unapproved:
+                raise UserError(
+                    self.env._("Every required document must be approved before the "
+                    "application is submitted. '%s' is not.",
+                    unapproved[0].type_id.display_name,)
+            )
+            loan.write(
+                {
+                    "state": "sent",
+                    "date_applied": fields.Date.context_today(loan),
+                }
+            )
         #
         # TODO (3.06): once the chatter is in place, post a note here, straight after
         # the state changes:
@@ -218,7 +227,6 @@ class LoanApplication(models.Model):
         # On loan, not on self: message_post writes to one record. mail.mt_note is
         # the internal-note subtype, so it lands in the history without emailing the
         # followers — leave it out and everyone following the record gets mail.
-        pass
 
     # ---------------------------------------------------------
     # CRUD OVERRIDES

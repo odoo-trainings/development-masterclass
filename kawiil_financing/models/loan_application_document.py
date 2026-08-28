@@ -45,8 +45,7 @@ class LoanApplicationDocument(models.Model):
     # the state it belongs to. The button you add for it is wired by this name.
 
     def action_reject_document(self):
-        # TODO (3.03): set state to "rejected".
-        pass
+        self.state = "rejected"
 
     # ---------------------------------------------------------
     # SUBMISSION RULES
