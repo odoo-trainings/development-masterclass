@@ -1,6 +1,4 @@
-# TODO (3.01): the compute method you write below is decorated with
-# @api.depends, so `api` has to join this import.
-from odoo import fields, models
+from odoo import api, fields, models
 
 # TODO (3.02): raising a ValidationError means importing it first:
 #     from odoo.exceptions import ValidationError
@@ -89,10 +87,9 @@ class LoanApplication(models.Model):
         comodel_name="res.partner", string="Customer", required=True
     )
 
-    # TODO (3.01): add two related fields that pull the customer's contact details
-    # onto this form: `email` from the partner's email, `phone` from the partner's
-    # phone. Both are Char. A related field is a computed field underneath, so
-    # leave the defaults alone — read-only, and not stored in the database.
+    email = fields.Char(related="partner_id.email")
+    
+    phone = fields.Char(related="partner_id.phone")
 
     user_id = fields.Many2one(
         comodel_name="res.users",
@@ -114,18 +111,7 @@ class LoanApplication(models.Model):
         string="Principal Amount", required=True, currency_field="currency_id"
     )
 
-    # TODO (3.01): loan_amount stops being a figure anyone types in.
-    #   - compute it from principal_amount - down_payment, in a method that
-    #     iterates explicitly with `for record in self:`
-    #   - decorate that method with @api.depends on both source fields
-    #   - give the field an inverse method as well, so that typing a loan_amount
-    #     works the deposit back out: down_payment = principal_amount - loan_amount
-    # Two things to expect once it is computed: a computed field is read-only
-    # unless it declares an inverse, and an unstored one cannot be searched or
-    # sorted, so COMMANDS.md's search([("loan_amount", ">", 10000)]) snippet stops
-    # working and the list view column stops sorting. store=True, or a search=
-    # method, brings those back.
-    loan_amount = fields.Monetary(currency_field="currency_id")
+    loan_amount = fields.Monetary(currency_field="currency_id", compute="_compute_loan_amount", inverse="_inverse_loan_amount")
 
     down_payment = fields.Monetary(currency_field="currency_id")
 
@@ -141,62 +127,14 @@ class LoanApplication(models.Model):
     # COMPUTE / INVERSE METHODS
     # ---------------------------------------------------------
 
-    # TODO (3.01): the two methods behind loan_amount. The names are not free
-    # choices — they are the strings you pass to compute= and inverse= on the
-    # field, and the quality gate expects a compute method to start with
-    # `_compute_`.
-    #
-    # _compute_loan_amount also needs a decorator, once `api` is imported:
-    #     @api.depends("principal_amount", "down_payment")
-    # Leave it off and the field is computed once and never refreshed again.
-
+    @api.depends("principal_amount", "down_payment")
     def _compute_loan_amount(self):
-        # TODO (3.01): the arithmetic is right, the shape is wrong. This assigns to
-        # self, which only works when self holds exactly one record — and a compute
-        # method is handed every record that needs the value at once, so as soon as
-        # two applications are read together it fails with
-        #
-        #     ValueError: Expected singleton: loan.application(1, 2, 3)
-        #
-        # That error is the one you will meet most often in Odoo, and this is what it
-        # always means: code written for one record was given several. Wrap the line
-        # in `for record in self:` and assign to record instead of self.
-        self.loan_amount = self.principal_amount - self.down_payment
+        for application in self:
+            application.loan_amount = application.principal_amount - application.down_payment
 
     def _inverse_loan_amount(self):
-        # TODO (3.01): the same arithmetic rearranged, in the shape you just gave the
-        # compute. Odoo calls this on save for the records whose loan_amount was
-        # typed in by hand, and principal_amount is the figure that stays put:
-        #     down_payment = principal_amount - loan_amount
-        pass
-
-    # Optional (3.01) — how to make loan_amount searchable again.
-    #
-    # An unstored computed field has no column behind it, so a domain cannot reach
-    # it and search([("loan_amount", ">", 10000)]) raises. Either store the field,
-    # or give it a search method: Odoo hands you the operator and the value out of
-    # the domain, and you hand back a domain it can actually run.
-    #
-    # Wire it onto the field:
-    #
-    #     loan_amount = fields.Monetary(
-    #         compute="_compute_loan_amount",
-    #         inverse="_inverse_loan_amount",
-    #         search="_search_loan_amount",
-    #         currency_field="currency_id",
-    #     )
-    #
-    # def _search_loan_amount(self, operator, value):
-    #     # Domains cannot do arithmetic, so the sum is worked out in Python and
-    #     # the answer handed back as a plain list of ids. search([]) is safe
-    #     # here: an empty domain never reads loan_amount, so this cannot recurse.
-    #     applications = self.search([])
-    #     matching = applications.filtered_domain([("loan_amount", operator, value)])
-    #     return [("id", "in", matching.ids)]
-    #
-    # Note what it costs: every application is loaded to answer one filter. That is
-    # the price of searching a field the database cannot see, and it is why
-    # store=True is usually the better answer when the arithmetic is this simple.
+        for application in self:
+            application.down_payment = application.principal_amount - application.loan_amount
 
     # ---------------------------------------------------------
     # CONSTRAINTS
