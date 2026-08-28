@@ -35,12 +35,6 @@
         <field name="arch" type="xml">
             <form string="Loan Application">
                 <header>
-                    <!-- Worked example, matching action_approve_loan. type="object"
-                         is what tells Odoo to call a Python method on the record
-                         rather than run an action, and invisible= keeps the button
-                         out of the way until it applies. Plain Python in that
-                         attribute: the attrs dictionary from older versions is
-                         gone. -->
                     <button name="action_approve_loan" type="object"
                             string="Approve" class="btn-primary"
                             invisible="state != 'sent'"/>
@@ -68,10 +62,6 @@
                         </group>
                         <group>
                             <field name="date_applied"/>
-                            <!-- Each decision date stays hidden until it has been
-                                 set, so a draft application is not cluttered with
-                                 empty fields. Same invisible= syntax as the header
-                                 buttons. -->
                             <field name="date_approved" invisible="not date_approved"/>
                             <field name="date_rejected" invisible="not date_rejected"/>
                             <field name="user_id"/>
@@ -82,10 +72,6 @@
                         <page string="Financials">
                             <group>
                                 <group>
-                                    <!-- currency_id has to sit in the same group
-                                         as the monetary fields: the widget needs a
-                                         currency to render, and crashes without
-                                         one. Leave it invisible. -->
                                     <field name="currency_id" invisible="1"/>
                                     <field name="principal_amount" widget="monetary"/>
                                     <field name="down_payment" widget="monetary"/>
@@ -105,9 +91,6 @@
                                     <field name="name"/>
                                     <field name="attachment_id"/>
                                     <field name="state"/>
-                                    <!-- A button in a list acts on the line it sits
-                                         on, so nothing needs passing to it. An icon
-                                         keeps the column narrow. -->
                                     <button name="action_approve_document"
                                             type="object" icon="fa-check"
                                             title="Approve"/>
@@ -122,11 +105,7 @@
                         </page>
                     </notebook>
                 </sheet>
-                <!-- TODO (3.06): the chatter goes here, between the sheet and the
-                     end of the form: a single <chatter/> node. Outside the sheet on
-                     purpose — the sheet is the record's own paper, the chatter is
-                     the conversation about it, and Odoo lays them out side by side
-                     on a wide screen. -->
+                <chatter/>
             </form>
         </field>
     </record>

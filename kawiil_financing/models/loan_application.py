@@ -5,29 +5,9 @@ from odoo.exceptions import UserError, ValidationError
 class LoanApplication(models.Model):
     _name = "loan.application"
     _description = "Loan Application"
+    _inherit = ["mail.thread", "mail.activity.mixin"]
 
-    # TODO (3.06): mix the chatter into this model by adding _inherit alongside the
-    # two lines above — keep _name, do not replace it:
-    #
-    #     _inherit = ["mail.thread", "mail.activity.mixin"]
-    #
-    # mail.thread brings the message history and followers; mail.activity.mixin
-    # brings scheduled activities. Both are AbstractModels: they have no table of
-    # their own, so nothing is copied at the database level, their fields and methods
-    # are simply folded into this model. That is why they are called mixins, though
-    # the mechanism is the same _name-plus-_inherit pairing you will use for real
-    # prototype inheritance in the final task.
-    #
-    # The mail module is already in the dependency graph, through product, so the
-    # manifest needs no change. Worth knowing that a module normally declares what it
-    # uses directly rather than leaning on someone else's dependency — this one is
-    # a deliberate shortcut, not the habit to take home.
-
-    # Database-level constraints, written with the models.Constraint API that
-    # replaced _sql_constraints in Odoo 19: a class attribute holding the SQL and
-    # the message shown when it is violated. Postgres enforces them, so they hold
-    # however the record was made — the form, an import, or the shell — which is
-    # exactly what makes them worth having.
+    
     _name_uniq = models.Constraint(
         "UNIQUE(name)",
         "Two applications cannot share the same reference.",
@@ -46,20 +26,11 @@ class LoanApplication(models.Model):
     date_applied = fields.Date(
         string="Application Date", default=fields.Date.context_today
     )
-
-    # No default on these two: they are stamped by the action methods when the
-    # decision is actually taken, not when the record is created.
+    
     date_approved = fields.Date(string="Approval Date")
 
     date_rejected = fields.Date(string="Rejection Date")
 
-    # TODO (3.06): once the chatter is in place, add tracking=True to this field and
-    # to principal_amount. Every change to a tracked field is then written into the
-    # record's message history by itself, with the old and new values side by side.
-    #
-    # Only these two. Tracking every field turns the chatter into noise nobody reads,
-    # which is worse than not having it: pick the ones somebody would be asked to
-    # account for later.
     state = fields.Selection(
         selection=[
             ("draft", "Draft"),
@@ -69,6 +40,7 @@ class LoanApplication(models.Model):
         ],
         default="draft",
         copy=False,
+        tracking=True,
     )
 
     active = fields.Boolean(default=True)
@@ -211,36 +183,15 @@ class LoanApplication(models.Model):
                     "date_applied": fields.Date.context_today(loan),
                 }
             )
-        #
-        # TODO (3.06): once the chatter is in place, post a note here, straight after
-        # the state changes:
-        #
-        #     loan.message_post(
-        #         body=self.env._("Application successfully submitted for review!"),
-        #         subtype_xmlid="mail.mt_note",
-        #     )
-        #
-        # On loan, not on self: message_post writes to one record. mail.mt_note is
-        # the internal-note subtype, so it lands in the history without emailing the
-        # followers — leave it out and everyone following the record gets mail.
+
+            loan.message_post(
+                body=self.env._("Application successfully submitted for review!"),
+                subtype_xmlid="mail.mt_note",
+            )
 
     # ---------------------------------------------------------
     # CRUD OVERRIDES
     # ---------------------------------------------------------
-
-    # TODO (3.04): the compliance checklist should build itself. Nobody should have
-    # to click "Add a line" five times to record the documents the dealership always
-    # asks for.
-    #
-    # Two methods, deliberately kept apart: a helper that decides which document
-    # types belong on a new application, and a create() override that turns them into
-    # lines. Split that way, a module inheriting this one can change what lands on
-    # the checklist by overriding the helper alone — the same reasoning that put
-    # _is_required_for_submit() on the document rather than here.
-
-    # TODO (3.04): this one needs a decorator. It runs before any record exists, so
-    # there is no recordset for it to work on: add @api.model above it once `api` is
-    # imported. The body is already written for you.
 
     @api.model
     def _get_default_document_types(self):

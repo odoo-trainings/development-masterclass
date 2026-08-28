@@ -25,7 +25,6 @@
             <field name="down_payment">2500.00</field>
             <field name="loan_term">48</field>
             <field name="interest_rate">7.50</field>
-            <field name="state">sent</field>
         </record>
         <record id="loan_application_demo_2" model="loan.application">
             <field name="name">LOAN/2026/002</field>
@@ -48,49 +47,10 @@
             <field name="interest_rate">7.50</field>
             <field name="state">draft</field>
         </record>
-
-        <!-- TODO (3.03): these records set state by hand, which walks straight
-             past the workflow you just built. Leave them for now: putting them
-             through the real methods means every application needs its compliance
-             documents first, and those do not exist yet. You come back to this at
-             3.04, once create() builds the checklist for you. -->
-
-        <!-- OPTIONAL (3.04): a stretch exercise, not part of the chapter. Skip it if
-             you are short of time.
-
-             Now that create() fills in the checklist, these records get their
-             document lines for free, and the state above can stop being a
-             hand-written lie. Replace it with the methods that earn it:
-
-                 <function model="loan.application.document" name="action_approve_document"
-                          eval="[obj().search([('application_id','=',ref('loan_application_demo_1')),
-                                               ('type_id.is_required','=',True)]).ids]"/>
-                 <function model="loan.application" name="action_submit"
-                          eval="[[ref('loan_application_demo_1')]]"/>
-
-             Approve first, then submit: action_submit refuses an application whose
-             required documents are not settled, which is the whole point of it.
-             Drop the state field from loan_application_demo_1 and let the calls set
-             it. Odoo's own demo data works this way, e.g. crm_lead_demo.xml calling
-             action_set_won. Only demo_1 needs it, since draft is the default.
-
-             Two details that decide whether this works:
-
-             1. `obj` in an eval is that function's own model, so obj().search(...)
-                searches loan.application.document. The lines are created by your
-                override and have no xml ids, so searching is how you reach them.
-             2. A function node runs in file order, so it has to sit after the
-                records it acts on. Inside data noupdate="1" it runs on install only
-                and is skipped on a module update.
-
-             Note that action_submit stamps date_applied with today, so demo_1 gives
-             up its fixed 2026-01-15 date.
-
-             Worth knowing before you spend time on it: demo data is loaded when the
-             module is installed, not when it is updated, and a function node inside
-             noupdate="1" is skipped on an update entirely. On a build that only
-             updates the module you will write this correctly and see nothing change.
-             It takes a fresh install to observe. -->
-
+        <function model="loan.application.document" name="action_approve_document"
+            eval="[obj().search([('application_id','=',ref('loan_application_demo_1')),
+            ('type_id.is_required','=',True)]).ids]"/>
+        <function model="loan.application" name="action_submit"
+            eval="[[ref('loan_application_demo_1')]]"/>
     </data>
 </odoo>
