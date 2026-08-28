@@ -1,10 +1,6 @@
-from odoo import api, fields, models
+from odoo import api, Command, fields, models
 
 from odoo.exceptions import UserError, ValidationError
-
-# TODO (3.04): Command joins the odoo import. Mind the order ruff wants —
-# capitals sort first: from odoo import Command, api, fields, models
-
 
 class LoanApplication(models.Model):
     _name = "loan.application"
@@ -246,27 +242,30 @@ class LoanApplication(models.Model):
     # there is no recordset for it to work on: add @api.model above it once `api` is
     # imported. The body is already written for you.
 
+    @api.model
     def _get_default_document_types(self):
         """The document types that belong on a new application's checklist."""
         # search([]) already leaves out the archived types: the model has an `active`
         # field, and Odoo filters on it unless you tell it otherwise.
         return self.env["loan.application.document.type"].search([])
 
-    # TODO (3.04): then the override itself. It is not stubbed here on purpose: a
-    # create() that forgets to return super()'s result breaks every record creation
-    # in the module, demo data included, so it is better written whole than left
-    # half-finished. Write it as:
-    #
-    #     @api.model_create_multi
-    #     def create(self, vals_list):
-    #         ...
-    #         return super().create(vals_list)
-    #
-    # Between those, for each vals dict in vals_list, turn each document type into a
-    # line with Command.create({"type_id": doc_type.id}) and add the list to
-    # vals["document_ids"]. Use vals.get("document_ids", []) + commands so that lines
-    # somebody already filled in during creation survive.
-    #
-    # Command is the named form of the old "magic tuples" — Command.create(...)
-    # instead of (0, 0, {...}). Import it only in the chapter you use it: an unused
-    # import is an F401 and the Quality Gate will stop you.
+    @api.model_create_multi
+    def create(self, vals_list):
+        """
+        Overrides standard creation to automatically inject the 
+        required document checklist.
+        """
+        # 1. Fetch the default types using our extensible helper
+        doc_types = self._get_default_document_types()
+
+        # 2. Modify the incoming dictionaries before they hit the database
+        for vals in vals_list:
+            if doc_types:
+                # Prepare the creation commands
+                commands = [Command.create({'type_id': dt.id}) for dt in doc_types]
+                
+                # Append to existing document_ids if they exist, otherwise initialize
+                vals['document_ids'] = vals.get('document_ids', []) + commands
+
+        # 3. Pass the modified vals_list to the standard ORM creation method
+        return super().create(vals_list)
